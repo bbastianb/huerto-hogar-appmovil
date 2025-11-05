@@ -4,24 +4,64 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.runtime.remember
-import androidx.navigation.compose.rememberNavController
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.room.Room
+import com.abs.huerto_hogar_appmovil.data.AppDatabase
+import com.abs.huerto_hogar_appmovil.data.repository.CarritoRepository
+import com.abs.huerto_hogar_appmovil.data.repository.ProductoRepository
 import com.abs.huerto_hogar_appmovil.data.repository.UsuarioRepository
-import com.abs.huerto_hogar_appmovil.navigation.AppNavGraph
+import com.abs.huerto_hogar_appmovil.ui.navigation.AppRoot
+import com.abs.huerto_hogar_appmovil.ui.viewmodels.CartViewModel
+import com.abs.huerto_hogar_appmovil.ui.viewmodels.CatalogoViewModel
 
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        setContent {
-            val navController = rememberNavController()
-            val usuarioRepository = remember { UsuarioRepository() }
+        val database = Room.databaseBuilder(
+            applicationContext,
+            AppDatabase::class.java,
+            "huerto_hogar_database"
+        ).build()
 
-            AppNavGraph(
-                navController = navController,
-                usuarioRepository = usuarioRepository
-            )
+        val productoRepository = ProductoRepository(database.productoDao())
+        val carritoRepository  = CarritoRepository(database.carritoDao(), productoRepository)
+        val usuarioRepository  = UsuarioRepository()
+
+
+        val catalogoViewModelFactory = object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                @Suppress("UNCHECKED_CAST")
+                return CatalogoViewModel(productoRepository, carritoRepository) as T
+            }
+        }
+        val cartViewModelFactory = object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                @Suppress("UNCHECKED_CAST")
+                return CartViewModel(carritoRepository) as T
+            }
+        }
+
+        setContent {
+            val cartViewModel: CartViewModel = viewModel(factory = cartViewModelFactory)
+
+            Surface(color = MaterialTheme.colorScheme.background) {
+                AppRoot(
+                    // Auth
+                    usuarioRepository = usuarioRepository,
+                    // Tienda
+                    productoRepository = productoRepository,
+                    catalogoViewModelFactory = catalogoViewModelFactory,
+                    cartViewModelFactory = cartViewModelFactory,
+                    cartViewModel = cartViewModel
+                )
+            }
         }
     }
 }

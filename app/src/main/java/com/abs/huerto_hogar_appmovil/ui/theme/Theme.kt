@@ -1,6 +1,8 @@
+// ui/theme/Theme.kt
 package com.abs.huerto_hogar_appmovil.ui.theme
 
 import android.app.Activity
+import androidx.compose.ui.graphics.Color
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -15,33 +17,57 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
-private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
-)
+
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
+    primary = Color(0xFF2E8B57), // Verde Esmeralda
+    onPrimary = Color(0xFFFFFFFF),
+    primaryContainer = Color(0xFFA8D5BA),
+    onPrimaryContainer = Color(0xFF00210E),
 
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+    secondary =Color(0xFFFFD700), // Amarillo Mostaza
+    onSecondary =Color(0xFF000000),
+    secondaryContainer =Color(0xFFFFF0A8),
+    onSecondaryContainer =Color(0xFF241A00),
+
+    tertiary =Color(0xFF8B4513), // Marrón Claro
+    onTertiary =Color(0xFFFFFFFF),
+    tertiaryContainer =Color(0xFFFFDCC2),
+    onTertiaryContainer =Color(0xFF301400),
+
+    background =Color(0xFFF7F7F7), // Blanco Suave
+    onBackground =Color(0xFF333333), // Gris Oscuro
+    surface =Color(0xFFFFFFFF),
+    onSurface =Color(0xFF333333),
+
+    surfaceVariant =Color(0xFFDEE5D9),
+    onSurfaceVariant =Color(0xFF424941),
+
+    outline =Color(0xFF727970),
+    outlineVariant =Color(0xFFC1C9BE)
 )
 
+private val DarkColorScheme = darkColorScheme(
+    primary = Color(0xFF4CAF50),        // Verde más claro para dark mode
+    onPrimary = Color(0xFF000000),
+    primaryContainer = Color(0xFF2E7D32),
+    onPrimaryContainer = Color(0xFFFFFFFF),
+
+    secondary = Color(0xFFFFC107),      // Amarillo para dark mode
+    onSecondary = Color(0xFF000000),
+    secondaryContainer = Color(0xFFF57C00),
+    onSecondaryContainer = Color(0xFFFFFFFF),
+
+    background = Color(0xFF121212),     // Fondo oscuro
+    onBackground = Color(0xFFFFFFFF),   // Texto blanco
+
+    surface = Color(0xFF1E1E1E),        // Cards oscuros
+    onSurface = Color(0xFFFFFFFF)
+)
 @Composable
 fun HuertohogarappmovilTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,      // Desactiva dynamic colors por ahora
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
@@ -49,9 +75,17 @@ fun HuertohogarappmovilTheme(
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
-
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
+    }
+
+    val view = LocalView.current
+    if (!view.isInEditMode) {
+        SideEffect {
+            val window = (view.context as Activity).window
+            window.statusBarColor = colorScheme.primary.toArgb()
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
+        }
     }
 
     MaterialTheme(

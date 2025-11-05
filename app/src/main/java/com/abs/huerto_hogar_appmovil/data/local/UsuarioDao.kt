@@ -5,7 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.abs.huerto_hogar_appmovil.model.Usuario
+import com.abs.huerto_hogar_appmovil.data.model.Usuario
 import kotlinx.coroutines.flow.Flow
 
 @Dao

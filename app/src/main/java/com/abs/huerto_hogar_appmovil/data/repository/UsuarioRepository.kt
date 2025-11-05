@@ -1,6 +1,6 @@
 package com.abs.huerto_hogar_appmovil.data.repository
 
-import com.abs.huerto_hogar_appmovil.model.Usuario
+import com.abs.huerto_hogar_appmovil.data.model.Usuario
 
 class UsuarioRepository {
 
