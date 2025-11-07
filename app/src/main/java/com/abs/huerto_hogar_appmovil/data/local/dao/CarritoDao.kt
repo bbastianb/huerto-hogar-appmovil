@@ -1,4 +1,4 @@
-package com.abs.huerto_hogar_appmovil.data
+package com.abs.huerto_hogar_appmovil.data.local.dao
 
 import androidx.room.Dao
 import androidx.room.Delete
@@ -31,7 +31,7 @@ interface CarritoDao {
     fun obtenerCarritoConProductos(): Flow<List<CarritoConProducto>>
 
     // Agrega los productos al carrito
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.Companion.REPLACE)
     suspend fun agregarItem(item: Carrito)
 
     // Obtiene todos los productos del carrito

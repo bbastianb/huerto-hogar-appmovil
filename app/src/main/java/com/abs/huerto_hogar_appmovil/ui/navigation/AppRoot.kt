@@ -1,22 +1,24 @@
-// ui/AppRoot.kt
-package com.abs.huerto_hogar_appmovil.ui.navegation
+package com.abs.huerto_hogar_appmovil.ui.navigation
 
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.*
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.abs.huerto_hogar_appmovil.data.repository.ProductoRepository
-import com.abs.huerto_hogar_appmovil.ui.viewmodels.CartViewModel
 import androidx.lifecycle.ViewModelProvider
+
+import com.abs.huerto_hogar_appmovil.data.repository.ProductoRepository
+import com.abs.huerto_hogar_appmovil.data.repository.UsuarioRepository
 import com.abs.huerto_hogar_appmovil.ui.components.HuertoBottomBar
+import com.abs.huerto_hogar_appmovil.ui.viewmodels.CartViewModel
 
 @Composable
 fun AppRoot(
+    usuarioRepository: UsuarioRepository,
+    productoRepository: ProductoRepository,
     catalogoViewModelFactory: ViewModelProvider.Factory,
     cartViewModelFactory: ViewModelProvider.Factory,
-    productoRepository: ProductoRepository,
     cartViewModel: CartViewModel
 ) {
     val navController = rememberNavController()
@@ -24,7 +26,10 @@ fun AppRoot(
 
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
     val hideBottomBar =
-        (currentRoute?.startsWith("detalle/") == true) || currentRoute == Destinations.CHECKOUT
+        (currentRoute?.startsWith("detalle_producto/") == true) ||
+                currentRoute == Routes.Checkout.route ||
+                currentRoute == Routes.Login.route ||
+                currentRoute == Routes.Registro.route
 
     Scaffold(
         bottomBar = {
@@ -42,14 +47,16 @@ fun AppRoot(
                 )
             }
         }
-    ) { innerPadding ->
-        HuertoHogarNavGraph(
+    ) { inner ->
+        AppNavGraph(
             navController = navController,
+            usuarioRepository = usuarioRepository,
+            productoRepository = productoRepository,
             catalogoViewModelFactory = catalogoViewModelFactory,
             cartViewModelFactory = cartViewModelFactory,
-            productoRepository = productoRepository,
             cartViewModel = cartViewModel,
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier.padding(inner),
+            startDestination = Routes.Login.route // o Routes.Catalogo.route si ya hay sesión
         )
     }
 }
