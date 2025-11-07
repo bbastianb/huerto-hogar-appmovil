@@ -2,6 +2,7 @@ package com.abs.huerto_hogar_appmovil.ui.screens.registro
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -10,17 +11,16 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.abs.huerto_hogar_appmovil.viewmodels.RegistroViewModel
+import com.abs.huerto_hogar_appmovil.ui.viewmodels.RegistroViewModel
 
 @Composable
 fun RegistroScreen(
-    onRegistroExitoso: () -> Unit,
-    onIrALogin: () -> Unit,
+    onRegistroExitoso: () -> Unit = {},
+    onIrALogin: () -> Unit = {},
     viewModel: RegistroViewModel
 ) {
-
     val nombre by viewModel.nombre.collectAsState()
     val apellido by viewModel.apellido.collectAsState()
     val correo by viewModel.correo.collectAsState()
@@ -34,7 +34,6 @@ fun RegistroScreen(
     val isSuccess by viewModel.isSuccess.collectAsState()
     val isCargando by viewModel.isLoading.collectAsState()
 
-    // Si el registro fue exitoso, navegar
     if (isSuccess) {
         LaunchedEffect(Unit) {
             onRegistroExitoso()
@@ -42,124 +41,186 @@ fun RegistroScreen(
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp)
-            .verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background
     ) {
-
-        // Título
-        Text(
-            text = "Registro",
-            style = MaterialTheme.typography.headlineLarge
-        )
-
-        // Campos del formulario
-        OutlinedTextField(
-            value = nombre,
-            onValueChange = viewModel::onNombreChange,
-            label = { Text("Nombre") },
-            leadingIcon = { Icon(Icons.Default.Person, "Nombre") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        OutlinedTextField(
-            value = apellido,
-            onValueChange = viewModel::onApellidoChange,
-            label = { Text("Apellido") },
-            leadingIcon = { Icon(Icons.Default.Person, "Apellido") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        OutlinedTextField(
-            value = correo,
-            onValueChange = viewModel::onCorreoChange,
-            label = { Text("Correo") },
-            leadingIcon = { Icon(Icons.Default.Email, "Correo") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        OutlinedTextField(
-            value = contrasenna,
-            onValueChange = viewModel::onContrasennaChange,
-            label = { Text("Contraseña") },
-            leadingIcon = { Icon(Icons.Default.Lock, "Contraseña") },
-            visualTransformation = PasswordVisualTransformation(),
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        OutlinedTextField(
-            value = confirmarContrasenna,
-            onValueChange = viewModel::onConfirmarContrasennaChange,
-            label = { Text("Confirmar Contraseña") },
-            leadingIcon = { Icon(Icons.Default.Lock, "Confirmar contraseña") },
-            visualTransformation = PasswordVisualTransformation(),
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        OutlinedTextField(
-            value = fono,
-            onValueChange = viewModel::onFonoChange,
-            label = { Text("Teléfono") },
-            leadingIcon = { Icon(Icons.Default.Phone, "Teléfono") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        OutlinedTextField(
-            value = direccion,
-            onValueChange = viewModel::onDireccionChange,
-            label = { Text("Dirección") },
-            leadingIcon = { Icon(Icons.Default.Home, "Dirección") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        OutlinedTextField(
-            value = comuna,
-            onValueChange = viewModel::onComunaChange,
-            label = { Text("Comuna") },
-            leadingIcon = { Icon(Icons.Default.LocationOn, "Comuna") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        OutlinedTextField(
-            value = region,
-            onValueChange = viewModel::onRegionChange,
-            label = { Text("Región") },
-            leadingIcon = { Icon(Icons.Default.Map, "Región") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        // Mensaje de error
-        errorMessage?.let { error ->
-            Text(
-                text = error,
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodySmall
-            )
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Botón de registro
-        Button(
-            onClick = viewModel::registrar,
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp)
+                .fillMaxSize()
+                .padding(horizontal = 20.dp, vertical = 24.dp)
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text("Crear cuenta")
-        }
 
-        Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "Crea tu cuenta",
+                style = MaterialTheme.typography.headlineLarge,
+                color = MaterialTheme.colorScheme.primary
+            )
 
-        // Botón para ir al login
-        TextButton(
-            onClick = onIrALogin,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        ) {
-            Text("¿Ya tienes cuenta? Inicia Sesión")
+            Divider(
+                color = MaterialTheme.colorScheme.primary,
+                thickness = 3.dp,
+                modifier = Modifier.width(64.dp)
+            )
+
+            Text(
+                text = "Únete a Huerto Hogar y recibe frescura del campo en tu mesa.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    HuertoTextField(
+                        value = nombre,
+                        onValue = viewModel::onNombreChange,
+                        label = "Nombre",
+                        leading = Icons.Filled.Person
+                    )
+
+                    HuertoTextField(
+                        value = apellido,
+                        onValue = viewModel::onApellidoChange,
+                        label = "Apellido",
+                        leading = Icons.Filled.Person
+                    )
+
+                    HuertoTextField(
+                        value = correo,
+                        onValue = viewModel::onCorreoChange,
+                        label = "Correo",
+                        leading = Icons.Filled.Email
+                    )
+
+                    HuertoTextField(
+                        value = contrasenna,
+                        onValue = viewModel::onContrasennaChange,
+                        label = "Contraseña",
+                        leading = Icons.Filled.Lock,
+                        isPassword = true
+                    )
+
+                    HuertoTextField(
+                        value = confirmarContrasenna,
+                        onValue = viewModel::onConfirmarContrasennaChange,
+                        label = "Confirmar contraseña",
+                        leading = Icons.Filled.Lock,
+                        isPassword = true
+                    )
+
+                    HuertoTextField(
+                        value = fono,
+                        onValue = viewModel::onFonoChange,
+                        label = "Teléfono",
+                        leading = Icons.Filled.Phone
+                    )
+
+                    HuertoTextField(
+                        value = direccion,
+                        onValue = viewModel::onDireccionChange,
+                        label = "Dirección",
+                        leading = Icons.Filled.Home
+                    )
+
+                    HuertoTextField(
+                        value = comuna,
+                        onValue = viewModel::onComunaChange,
+                        label = "Comuna",
+                        leading = Icons.Filled.LocationOn
+                    )
+
+                    HuertoTextField(
+                        value = region,
+                        onValue = viewModel::onRegionChange,
+                        label = "Región",
+                        leading = Icons.Filled.Map
+                    )
+
+                    errorMessage?.let { error ->
+                        Text(
+                            text = error,
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+
+                    Spacer(Modifier.height(8.dp))
+
+                    Button(
+                        onClick = viewModel::registrar,
+                        enabled = !isCargando,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
+                        ),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text(if (isCargando) "Creando..." else "Crear cuenta")
+                    }
+
+
+                    TextButton(
+                        onClick = onIrALogin,
+                        modifier = Modifier.align(Alignment.CenterHorizontally),
+                        colors = ButtonDefaults.textButtonColors(
+                            contentColor = MaterialTheme.colorScheme.primary
+                        )
+                    ) {
+                        Text("¿Ya tienes cuenta? Inicia sesión")
+                    }
+                }
+            }
         }
     }
+}
+
+@Composable
+private fun HuertoTextField(
+    value: String,
+    onValue: (String) -> Unit,
+    label: String,
+    leading: androidx.compose.ui.graphics.vector.ImageVector,
+    isPassword: Boolean = false
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValue,
+        label = { Text(label) },
+        leadingIcon = {
+            Icon(
+                imageVector = leading,
+                contentDescription = label
+            )
+        },
+        visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
+        singleLine = true,
+        shape = RoundedCornerShape(12.dp),
+        modifier = Modifier.fillMaxWidth(),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = MaterialTheme.colorScheme.primary,
+            focusedLabelColor = MaterialTheme.colorScheme.primary,
+            cursorColor = MaterialTheme.colorScheme.primary,
+            focusedLeadingIconColor = MaterialTheme.colorScheme.primary,
+            unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+            unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            unfocusedLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            focusedContainerColor = MaterialTheme.colorScheme.surface,
+            unfocusedContainerColor = MaterialTheme.colorScheme.surface
+        )
+    )
 }

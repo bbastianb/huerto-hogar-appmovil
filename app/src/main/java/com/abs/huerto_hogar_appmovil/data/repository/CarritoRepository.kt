@@ -1,7 +1,7 @@
 package com.abs.huerto_hogar_appmovil.data.repository
 
 import com.abs.huerto_hogar_appmovil.data.model.Carrito
-import com.abs.huerto_hogar_appmovil.data.CarritoDao
+import com.abs.huerto_hogar_appmovil.data.local.dao.CarritoDao
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 

@@ -1,4 +1,4 @@
-package com.abs.huerto_hogar_appmovil.data.local
+package com.abs.huerto_hogar_appmovil.data.local.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
@@ -16,7 +16,7 @@ interface UsuarioDao {
     suspend fun login(email: String, contrasenna: String): Usuario?
 
     /* Insertar Usuarios */
-    @Insert(onConflict = OnConflictStrategy.ABORT)
+    @Insert(onConflict = OnConflictStrategy.Companion.ABORT)
     suspend fun insertarUsuario(usuario: Usuario): Long
 
     /* Buscar Por EMAIL */

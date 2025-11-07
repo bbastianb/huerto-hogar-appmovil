@@ -20,10 +20,11 @@ import com.abs.huerto_hogar_appmovil.ui.screens.CatalogoScreen
 import com.abs.huerto_hogar_appmovil.ui.screens.CarritoScreen
 import com.abs.huerto_hogar_appmovil.ui.screens.DetalleProductoScreen
 
-import com.abs.huerto_hogar_appmovil.viewmodels.RegistroViewModel
+import com.abs.huerto_hogar_appmovil.ui.viewmodels.RegistroViewModel
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.CartViewModel
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.DetalleProductoViewModel
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.DetalleProductoViewModelFactory
+import com.abs.huerto_hogar_appmovil.ui.viewmodels.LoginViewModel
 
 @Composable
 fun AppNavGraph(
@@ -43,10 +44,19 @@ fun AppNavGraph(
         modifier = modifier
     ) {
         composable(Routes.Login.route) {
+            val loginViewModel: LoginViewModel = viewModel(
+                factory = object : ViewModelProvider.Factory {
+                    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                        @Suppress("UNCHECKED_CAST")
+                        return LoginViewModel(usuarioRepository) as T
+                    }
+                }
+            )
+
             LoginScreen(
+                viewModel = loginViewModel,
                 onRegistroClick = { navController.navigate(Routes.Registro.route) },
                 onLoginOk = {
-                    // post-login: ve al catálogo
                     navController.navigate(Routes.Catalogo.route) {
                         popUpTo(Routes.Login.route) { inclusive = true }
                         launchSingleTop = true

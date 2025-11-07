@@ -1,4 +1,4 @@
-package com.abs.huerto_hogar_appmovil.data
+package com.abs.huerto_hogar_appmovil.data.local.dao
 
 import androidx.room.Dao
 import androidx.room.Delete
@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ProductoDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.Companion.REPLACE)
     suspend fun agregarProducto(productos: List<Producto>)
     @Update
     suspend fun actualizarProducto(productos: Producto)

@@ -10,11 +10,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.room.Room
-import com.abs.huerto_hogar_appmovil.data.AppDatabase
+import com.abs.huerto_hogar_appmovil.data.local.AppDatabase
 import com.abs.huerto_hogar_appmovil.data.repository.CarritoRepository
 import com.abs.huerto_hogar_appmovil.data.repository.ProductoRepository
 import com.abs.huerto_hogar_appmovil.data.repository.UsuarioRepository
 import com.abs.huerto_hogar_appmovil.ui.navigation.AppRoot
+import com.abs.huerto_hogar_appmovil.ui.theme.HuertohogarappmovilTheme
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.CartViewModel
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.CatalogoViewModel
 
@@ -49,18 +50,20 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
-            val cartViewModel: CartViewModel = viewModel(factory = cartViewModelFactory)
 
-            Surface(color = MaterialTheme.colorScheme.background) {
-                AppRoot(
-                    // Auth
-                    usuarioRepository = usuarioRepository,
-                    // Tienda
-                    productoRepository = productoRepository,
-                    catalogoViewModelFactory = catalogoViewModelFactory,
-                    cartViewModelFactory = cartViewModelFactory,
-                    cartViewModel = cartViewModel
-                )
+            HuertohogarappmovilTheme {
+                Surface {
+                    val cartViewModel: CartViewModel = viewModel(factory = cartViewModelFactory)
+                    AppRoot(
+                        // Auth
+                        usuarioRepository = usuarioRepository,
+                        // Tienda
+                        productoRepository = productoRepository,
+                        catalogoViewModelFactory = catalogoViewModelFactory,
+                        cartViewModelFactory = cartViewModelFactory,
+                        cartViewModel = cartViewModel
+                    )
+                }
             }
         }
     }

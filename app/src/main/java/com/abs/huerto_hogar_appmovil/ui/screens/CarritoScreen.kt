@@ -53,6 +53,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.ui.res.painterResource
+import com.abs.huerto_hogar_appmovil.data.local.dao.CarritoDao
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -219,7 +220,7 @@ fun CarritoScreen(
 
 @Composable
 fun CarritoItemCard(
-    item: com.abs.huerto_hogar_appmovil.data.CarritoDao.CarritoConProducto,
+    item: CarritoDao.CarritoConProducto,
     onQuantityChange: (Int) -> Unit,
     onRemove: () -> Unit
 ) {

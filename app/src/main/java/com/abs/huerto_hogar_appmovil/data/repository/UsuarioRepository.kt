@@ -7,6 +7,35 @@ class UsuarioRepository {
     /* Mi lista con usuarios simulados */
     private val usuariosRegistrados = mutableListOf<Usuario>()
 
+    init {
+        usuariosRegistrados.add(
+            Usuario(
+                nombre = "Juan",
+                apellido = "Pérez",
+                correo = "juan@duoc.cl",
+                contrasenna = "1234",
+                fono = 912345678,
+                direccion = "Av. Principal 123",
+                comuna = "Santiago",
+                region = "Metropolitana",
+                rol = "usuario"
+            )
+        )
+        usuariosRegistrados.add(
+            Usuario(
+                nombre = "María",
+                apellido = "González",
+                correo = "maria@gmail.com",
+                contrasenna = "abcd",
+                fono = 987654321,
+                direccion = "Calle Secundaria 456",
+                comuna = "Providencia",
+                region = "Metropolitana",
+                rol = "usuario"
+            )
+        )
+    }
+
     suspend fun registrarUsuario(usuario: Usuario): Boolean {
         return try {
             /* Busca un usuario y setea al usuarioExistente */

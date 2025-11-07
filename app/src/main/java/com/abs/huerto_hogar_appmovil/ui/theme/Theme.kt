@@ -17,8 +17,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
-
-
 private val LightColorScheme = lightColorScheme(
     primary = Color(0xFF2E8B57), // Verde Esmeralda
     onPrimary = Color(0xFFFFFFFF),
@@ -49,7 +47,7 @@ private val LightColorScheme = lightColorScheme(
 
 private val DarkColorScheme = darkColorScheme(
     primary = Color(0xFF4CAF50),        // Verde más claro para dark mode
-    onPrimary = Color(0xFF000000),
+    onPrimary = Color(0xFF282828),
     primaryContainer = Color(0xFF2E7D32),
     onPrimaryContainer = Color(0xFFFFFFFF),
 
@@ -58,7 +56,7 @@ private val DarkColorScheme = darkColorScheme(
     secondaryContainer = Color(0xFFF57C00),
     onSecondaryContainer = Color(0xFFFFFFFF),
 
-    background = Color(0xFF121212),     // Fondo oscuro
+    background = Color(0xFF333131),     // Fondo oscuro
     onBackground = Color(0xFFFFFFFF),   // Texto blanco
 
     surface = Color(0xFF1E1E1E),        // Cards oscuros
@@ -91,6 +89,6 @@ fun HuertohogarappmovilTheme(
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,
-        content = content
+        content =content
     )
 }
