@@ -61,7 +61,26 @@ class UsuarioRepository {
         }
     }
 
-    /* Obtiene el tamaño de la lista */
+    suspend fun obtenerTodosLosUsuarios(): List<Usuario> {
+        return usuariosRegistrados.toList()
+    }
+
+
+    suspend fun eliminarUsuario(correo: String): Boolean {
+        return try {
+            val usuarioExistente = usuariosRegistrados.find { it.correo == correo }
+            if (usuarioExistente != null) {
+                usuariosRegistrados.remove(usuarioExistente)
+                true
+            } else {
+                false
+            }
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+
     fun obtenerTotalUsuarios(): Int {
         return usuariosRegistrados.size
     }
