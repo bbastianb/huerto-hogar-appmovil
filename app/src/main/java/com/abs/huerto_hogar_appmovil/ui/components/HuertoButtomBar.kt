@@ -10,6 +10,8 @@ import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.List
 import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.material.icons.outlined.Person
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 
 @Composable
 fun HuertoBottomBar(
@@ -17,12 +19,34 @@ fun HuertoBottomBar(
     onNavigate: (String) -> Unit,
     cartCount: Int
 ) {
-    NavigationBar {
+    NavigationBar(
+    ) {
+        val itemColors = NavigationBarItemDefaults.colors(
+            // Color del ícono y texto cuando está seleccionado
+            selectedIconColor = MaterialTheme.colorScheme.primary, // Color del icono seleccionado
+            selectedTextColor = MaterialTheme.colorScheme.primary, // Color del texto seleccionado
+
+            // Color del "resaltado" en forma de píldora
+            indicatorColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
+
+            // Color del ícono y texto cuando NO está seleccionado
+            unselectedIconColor = Color(0xFFFFFFFF).copy(alpha = 0.6f),
+            unselectedTextColor =  Color(0xFFFFFFFF).copy(alpha = 0.6f),
+        )
+
+        NavigationBarItem(
+            selected = selectedRoute == "home",
+            onClick = { onNavigate("home") },
+            icon = { Icon(Icons.Outlined.Home, contentDescription = "Inicio") },
+            label = { Text("Inicio") },
+            colors = itemColors
+        )
         NavigationBarItem(
             selected = selectedRoute == "catalogo",
             onClick = { onNavigate("catalogo") },
             icon = { Icon(Icons.Outlined.List, contentDescription = "Catálogo") },
-            label = { Text("Catálogo") }
+            label = { Text("Catálogo") },
+            colors = itemColors
         )
         NavigationBarItem(
             selected = selectedRoute == "carrito",
@@ -36,19 +60,15 @@ fun HuertoBottomBar(
                     Icon(Icons.Outlined.ShoppingCart, contentDescription = "Carrito")
                 }
             },
-            label = { Text("Carrito") }
-        )
-        NavigationBarItem(
-            selected = selectedRoute == "home",
-            onClick = { onNavigate("home") },
-            icon = { Icon(Icons.Outlined.Home, contentDescription = "Inicio") },
-            label = { Text("Inicio") }
+            label = { Text("Carrito") },
+            colors = itemColors
         )
         NavigationBarItem(
             selected = selectedRoute == "perfil",
             onClick = { onNavigate("perfil") },
             icon = { Icon(Icons.Outlined.Person, contentDescription = "Perfil") },
-            label = { Text("Perfil") }
+            label = { Text("Perfil") },
+            colors = itemColors
         )
     }
 }

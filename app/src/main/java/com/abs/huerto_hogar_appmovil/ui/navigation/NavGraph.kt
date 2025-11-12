@@ -1,5 +1,8 @@
 package com.abs.huerto_hogar_appmovil.ui.navigation
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -25,6 +28,14 @@ import com.abs.huerto_hogar_appmovil.ui.viewmodels.CartViewModel
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.DetalleProductoViewModel
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.DetalleProductoViewModelFactory
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.LoginViewModel
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.unit.dp
 
 @Composable
 fun AppNavGraph(
@@ -92,16 +103,25 @@ fun AppNavGraph(
                 onCartClick = { navController.navigate(Routes.Carrito.route) },
                 onProductClick = { productoId ->
                     navController.navigate(Routes.DetalleProducto.build(productoId))
+                },onAddToCart = { id, cantidad ->
+                    cartViewModel.agregarAlCarrito(id, cantidad)
                 }
+
             )
         }
 
         composable(Routes.Carrito.route) {
             CarritoScreen(
                 viewModel = viewModel(factory = cartViewModelFactory),
-                onBackClick = { navController.popBackStack() },
-                onCheckoutClick = { navController.navigate(Routes.Checkout.route) }
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onCheckoutClick = {
+                    navController.navigate(Routes.Checkout.route)
+                }
+
             )
+
         }
 
         composable(
@@ -122,8 +142,25 @@ fun AppNavGraph(
         }
 
         composable(Routes.Checkout.route) {
-            // puedes reutilizar tu pantalla futura de checkout
-            // o una placeholder acá
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("💰 Checkout", style = MaterialTheme.typography.headlineMedium)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text("Procesando compra...")
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Button(onClick = {
+                        navController.popBackStack(Routes.Catalogo.route, false)
+                    }) {
+                        Text("Volver al Catálogo")
+                    }
+                }
+            }
         }
     }
 }
+

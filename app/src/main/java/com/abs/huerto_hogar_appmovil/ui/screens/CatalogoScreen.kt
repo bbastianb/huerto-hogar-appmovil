@@ -59,6 +59,12 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.CatalogoViewModel
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -71,18 +77,22 @@ fun CatalogoScreen(
     viewModel: CatalogoViewModel = viewModel(),
     onCartClick: () -> Unit = {},
     onProductClick: (String) -> Unit = {},
-    onBackClick: () -> Unit = {}
+    onBackClick: () -> Unit = {},
+    onAddToCart: (String, Int) -> Unit
 ) {
-    val productos by viewModel.productos.collectAsState()
+    val productos by viewModel.productos.collectAsState(emptyList())
     val isLoading by viewModel.isLoading.collectAsState()
     val categoriaSeleccionada by viewModel.categoria.collectAsState()
 
     var searchQuery by remember { mutableStateOf("") }
     var isSearching by remember { mutableStateOf(false) }
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+    var showQuickView by remember { mutableStateOf(false) }
+    var selected by remember { mutableStateOf<Producto?>(null) }
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        contentWindowInsets = WindowInsets(0.dp,0.dp,0.dp,0.dp),
         topBar = {
             if (isSearching) {
                 TopAppBar(
@@ -133,11 +143,11 @@ fun CatalogoScreen(
                 CenterAlignedTopAppBar(
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = MaterialTheme.colorScheme.primary,
-                        titleContentColor = MaterialTheme.colorScheme.onBackground,
+                        titleContentColor = MaterialTheme.colorScheme.onPrimary,
                     ),
                     title = {
                         Text(
-                            "HuertoHogar",
+                            "Catálogo",
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                             style = MaterialTheme.typography.headlineSmall,
@@ -160,32 +170,33 @@ fun CatalogoScreen(
                                 tint = MaterialTheme.colorScheme.onSecondary
                             )
                         }
-                        IconButton(onClick = onCartClick) {
-                            Icon(
-                                imageVector = Icons.Default.ShoppingCart,
-                                contentDescription = "Carrito",
-                                tint = MaterialTheme.colorScheme.onSecondary
-                            )
-                        }
+//                        IconButton(onClick = onCartClick) {
+//                            Icon(
+//                                imageVector = Icons.Default.ShoppingCart,
+//                                contentDescription = "Carrito",
+//                                tint = MaterialTheme.colorScheme.onSecondary
+//                            )
+//                        }
                     },
                     scrollBehavior = scrollBehavior,
+
                 )
             }
-        },
-        floatingActionButton = {
-            if (!isSearching) {
-                FloatingActionButton(
-                    onClick = onCartClick,
-                    containerColor = MaterialTheme.colorScheme.primary
-                ) {
-                    Icon(
-                        Icons.Default.ShoppingCart,
-                        "Carrito",
-                        tint = MaterialTheme.colorScheme.onPrimary
-                    )
-                }
-            }
         }
+//        floatingActionButton = {
+//            if (!isSearching) {
+//                FloatingActionButton(
+//                    onClick = onCartClick,
+//                    containerColor = MaterialTheme.colorScheme.primary
+//                ) {
+//                    Icon(
+//                        Icons.Default.ShoppingCart,
+//                        "Carrito",
+//                        tint = MaterialTheme.colorScheme.onPrimary
+//                    )
+//                }
+//            }
+//        }
     ) { innerPadding ->
         if (isLoading) {
             Box(
@@ -205,12 +216,12 @@ fun CatalogoScreen(
                     .padding(innerPadding)
             ) {
                 if (!isSearching) {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        "Catálogo de Productos",
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.Normal
-                    )
+//                    Spacer(modifier = Modifier.height(8.dp))
+//                    Text(
+//                        "Catálogo de Productos",
+//                        style = MaterialTheme.typography.headlineSmall,
+//                        fontWeight = FontWeight.Normal
+//                    )
 
                     CategoriaFiltro(
                         categorias = listOf("Todas", "Frutas", "Verduras", "Orgánicos", "Lácteos"),
@@ -220,33 +231,110 @@ fun CatalogoScreen(
                     Spacer(modifier = Modifier.height(8.dp))
                 }
                 // PRODUCTOS
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    items(productos, key = { it.id }) { producto ->
+                LazyColumn {
+                    items(productos) { p ->
                         ProductoCard(
-                            producto = producto,
-                            onProductClick = { productoId ->
-                                onProductClick(productoId)
+                            producto = p,
+                            onProductClick = { id ->
+                                // si quieres que el "tocar card" abra el quick view:
+                                selected = p
+                                showQuickView = true
+
+                                // si en vez de quick view quieres navegar:
+                                // onProductClick(id)
                             },
-                            onAddToCart = { productoId ->
-                                viewModel.agregarAlCarrito(productoId)
+                            onAddToCart = { id ->
+                                onAddToCart(id, 1)
+                            }
+                        )
+                        Spacer(Modifier.height(8.dp))
+                    }
+                }
+                if (showQuickView && selected != null) {
+                    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+                    ModalBottomSheet(
+                        onDismissRequest = { showQuickView = false },
+                        sheetState = sheetState
+                    ) {
+                        // Contenido del quick view:
+                        QuickViewProducto(
+                            producto = selected!!,
+                            onAdd = {
+                                onAddToCart(selected!!.id, 1)
+                                showQuickView = false
+                            },
+                            onVerMas = {
+                                showQuickView = false
+                                onProductClick(selected!!.id) // navegar al detalle completo si quieres
                             }
                         )
                     }
-
-                    item {
-                        Spacer(modifier = Modifier.height(20.dp))
-                    }
                 }
+
             }
         }
     }
 }
-
+@Composable
+fun QuickViewProducto(
+    producto: Producto,
+    onAdd: () -> Unit,
+    onVerMas: () -> Unit
+) {
+    Column(Modifier.padding(16.dp)) {
+        Image(
+            painter = painterResource(id = producto.imagen),
+            contentDescription = producto.nombre,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp)
+                .clip(RoundedCornerShape(8.dp, topEnd = 8.dp))
+                .background(MaterialTheme.colorScheme.surfaceVariant),
+            contentScale = ContentScale.Crop
+        )
+        Spacer(Modifier.height(6.dp))
+        Text(producto.nombre, style = MaterialTheme.typography.titleLarge)
+        Spacer(Modifier.height(6.dp))
+        Text("$${producto.precio} / ${producto.medida}")
+        Spacer(Modifier.height(8.dp))
+        Text(
+            text = producto.descripcion,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            text = "Stock: ${producto.stock}",
+            style = MaterialTheme.typography.bodySmall,
+            color = if (producto.stock > 0) MaterialTheme.colorScheme.onSurfaceVariant
+            else MaterialTheme.colorScheme.error
+        )
+        Row {
+            botonAddCart {
+                onAdd()
+            }
+            Spacer(Modifier.width(8.dp))
+            OutlinedButton(onClick = onVerMas, modifier = Modifier.weight(1f)) {
+                Text("Ver detalle")
+            }
+        }
+        Spacer(Modifier.height(12.dp))
+    }
+}
+@Composable
+fun botonAddCart(onClick: () -> Unit) {
+    Button(onClick = { onClick() }) {
+        Icon(
+            imageVector = Icons.Default.ShoppingCart,
+            contentDescription = "Añadir al carrito",
+            modifier = Modifier.size(ButtonDefaults.IconSize)
+        )
+        Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
+        Text("Añadir al carrito")
+    }
+}
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CategoriaFiltro(
@@ -294,22 +382,23 @@ fun CategoriaFiltro(
         }
     }
 }
+
 @Composable
 fun ProductoCard(
     producto: Producto,
     onProductClick: (String) -> Unit,
     onAddToCart: (String) -> Unit,
-    modifier: Modifier=Modifier
+    modifier: Modifier = Modifier
 ) {
     var showMessage by remember { mutableStateOf(false) }
     LaunchedEffect(showMessage) {
         if (showMessage) {
             delay(2000)
-            showMessage=false
+            showMessage = false
         }
     }
     Card(
-        onClick = {onProductClick(producto.id)},
+        onClick = { onProductClick(producto.id) },
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         colors = CardDefaults.cardColors(
@@ -359,15 +448,15 @@ fun ProductoCard(
 
                     Spacer(modifier = Modifier.height(4.dp))
 
-                    Text(
-                        text = producto.descripcion,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
+//                    Text(
+//                        text = producto.descripcion,
+//                        style = MaterialTheme.typography.bodySmall,
+//                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+//                        maxLines = 2,
+//                        overflow = TextOverflow.Ellipsis
+//                    )
+//
+//                    Spacer(modifier = Modifier.height(8.dp))
 
                     Row(
                         verticalAlignment = Alignment.CenterVertically
@@ -388,12 +477,30 @@ fun ProductoCard(
                         )
 
                         Spacer(modifier = Modifier.width(8.dp))
+//
+//                        Text(
+//                            text = "Stock: ${producto.stock}",
+//                            style = MaterialTheme.typography.bodySmall,
+//                            color = if (producto.stock > 0) MaterialTheme.colorScheme.onSurfaceVariant
+//                            else MaterialTheme.colorScheme.error
+//                        )
 
+                    }
+                    if (showMessage) {
+                        Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "Stock: ${producto.stock}",
+                            text = "✅ Agregado al carrito",
                             style = MaterialTheme.typography.bodySmall,
-                            color = if (producto.stock > 0) MaterialTheme.colorScheme.onSurfaceVariant
-                            else MaterialTheme.colorScheme.error
+                            color = MaterialTheme.colorScheme.onSecondary,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(
+                                    MaterialTheme.colorScheme.primaryContainer,
+                                    RoundedCornerShape(8.dp)
+                                )
+                                .padding(vertical = 4.dp, horizontal = 8.dp),
+                            textAlign = TextAlign.Center,
+                            fontWeight = FontWeight.Medium
                         )
                     }
                 }
@@ -414,23 +521,7 @@ fun ProductoCard(
                     )
                 }
             }
-            if (showMessage) {
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = "✅ Agregado al carrito",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSecondary,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(
-                            MaterialTheme.colorScheme.primaryContainer,
-                            RoundedCornerShape(8.dp)
-                        )
-                        .padding(8.dp),
-                    textAlign = TextAlign.Center,
-                    fontWeight = FontWeight.Medium
-                )
-            }
+
         }
     }
 }
