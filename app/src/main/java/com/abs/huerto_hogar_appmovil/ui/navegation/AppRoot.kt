@@ -25,6 +25,7 @@ fun AppRoot(
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
     val hideBottomBar =
         (currentRoute?.startsWith("detalle/") == true) || currentRoute == Destinations.CHECKOUT
+                
 
     Scaffold(
         bottomBar = {

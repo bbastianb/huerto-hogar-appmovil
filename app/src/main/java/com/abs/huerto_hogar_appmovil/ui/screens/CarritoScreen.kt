@@ -67,6 +67,8 @@ fun CarritoScreen(
     val mensaje by viewModel.mensaje.collectAsState()
 
     Scaffold(
+        contentWindowInsets = WindowInsets(0.dp,0.dp,0.dp,0.dp),
+
         topBar = {
             CenterAlignedTopAppBar(
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -105,7 +107,6 @@ fun CarritoScreen(
                 Surface(
                     tonalElevation = 8.dp,
                     shadowElevation = 8.dp,
-                    modifier = Modifier.padding(WindowInsets.navigationBars.asPaddingValues())
                 ) {
                     Column(
                         modifier = Modifier

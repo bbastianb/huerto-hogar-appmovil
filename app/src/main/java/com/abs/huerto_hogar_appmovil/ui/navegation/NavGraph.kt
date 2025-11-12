@@ -49,9 +49,12 @@ fun HuertoHogarNavGraph(
                 viewModel = viewModel(factory = catalogoViewModelFactory),
                 onCartClick = {
                     navController.navigate(Destinations.CARRITO)
-                },
-                onProductClick = { productoId ->
+                },onProductClick = { productoId ->
                     navController.navigate(Destinations.detalleProductoRoute(productoId))
+                },
+                // 👇 Nuevo: lo usa el Quick View para agregar al carrito
+                onAddToCart = { id, cantidad ->
+                    cartViewModel.agregarAlCarrito(id, cantidad)
                 }
             )
         }
