@@ -11,7 +11,7 @@ import com.abs.huerto_hogar_appmovil.data.AppDatabase
 import com.abs.huerto_hogar_appmovil.data.repository.CarritoRepository
 import com.abs.huerto_hogar_appmovil.data.repository.ProductoRepository
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.abs.huerto_hogar_appmovil.ui.navegation.AppRoot
+import com.abs.huerto_hogar_appmovil.ui.navigation.AppRoot
 import com.abs.huerto_hogar_appmovil.ui.theme.HuertohogarappmovilTheme
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.CartViewModel
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.CatalogoViewModel
