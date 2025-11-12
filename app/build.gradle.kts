@@ -49,10 +49,9 @@ dependencies {
     // Room
     val roomVersion = "2.8.1" // Usa la versión más reciente
     implementation("androidx.room:room-runtime:$roomVersion")
-
     ksp("androidx.room:room-compiler:$roomVersion")
 
-    annotationProcessor("androidx.room:room-compiler:$roomVersion")
+    //annotationProcessor("androidx.room:room-compiler:$roomVersion")
     implementation("androidx.room:room-ktx:$roomVersion") // Soporte para Coroutines
 
     // ViewModel y LiveData (si no usas StateFlow)
@@ -66,8 +65,8 @@ dependencies {
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.material3:material3")
 
+    implementation("androidx.compose.material:material-icons-extended")
 
-    implementation("androidx.compose.material:material-icons-core:1.6.8")
 
     implementation("androidx.emoji2:emoji2:1.4.0")//eliminar sola para antes de agregar fotos
     implementation(libs.androidx.core.ktx)

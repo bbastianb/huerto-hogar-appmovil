@@ -2,7 +2,7 @@ package com.abs.huerto_hogar_appmovil.data.repository
 
 import com.abs.huerto_hogar_appmovil.R
 import com.abs.huerto_hogar_appmovil.data.model.Producto
-import com.abs.huerto_hogar_appmovil.data.ProductoDao
+import com.abs.huerto_hogar_appmovil.data.local.dao.ProductoDao
 import kotlinx.coroutines.flow.Flow
 
 class ProductoRepository(private val productoDao: ProductoDao) {

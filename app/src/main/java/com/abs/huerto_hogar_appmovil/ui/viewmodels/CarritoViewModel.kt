@@ -3,7 +3,7 @@ package com.abs.huerto_hogar_appmovil.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.abs.huerto_hogar_appmovil.data.CarritoDao
+import com.abs.huerto_hogar_appmovil.data.local.dao.CarritoDao
 import com.abs.huerto_hogar_appmovil.data.repository.CarritoRepository
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
