@@ -66,6 +66,11 @@ dependencies {
     implementation("androidx.compose.material3:material3")
 
     implementation("androidx.compose.material:material-icons-extended")
+    
+    implementation("com.google.android.gms:play-services-maps:18.1.0")
+    implementation("com.google.android.gms:play-services-location:21.0.1")
+    implementation("com.google.maps.android:maps-compose:2.11.4")
+
 
 
     implementation("androidx.emoji2:emoji2:1.4.0")//eliminar sola para antes de agregar fotos

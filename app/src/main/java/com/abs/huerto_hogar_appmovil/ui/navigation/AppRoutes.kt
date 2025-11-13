@@ -9,8 +9,14 @@ sealed class Routes(val route: String) {
     data object Catalogo : Routes("catalogo")
     data object Carrito : Routes("carrito")
     data object Checkout : Routes("checkout")
+    // Home
+    data object Home : Routes("home")
+    data object Nosotros : Routes("nosotros")
+    data object Contacto : Routes("contacto")
+
 
     // Admin
+    data object AdminScreen : Routes("admin_screen")
     data object ListadoUsers : Routes("listadoUsers")
 
     // Detalle con parámetro

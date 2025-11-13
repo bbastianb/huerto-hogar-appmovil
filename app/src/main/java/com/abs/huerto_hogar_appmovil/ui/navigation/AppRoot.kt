@@ -29,7 +29,8 @@ fun AppRoot(
         (currentRoute?.startsWith("detalle_producto/") == true) ||
                 currentRoute == Routes.Checkout.route ||
                 currentRoute == Routes.Login.route ||
-                currentRoute == Routes.Registro.route
+                currentRoute == Routes.Registro.route ||
+                currentRoute == Routes.AdminScreen.route
 
     Scaffold(
         bottomBar = {
@@ -37,8 +38,8 @@ fun AppRoot(
                 HuertoBottomBar(
                     selectedRoute = currentRoute,
                     onNavigate = { route ->
+                        // Navegación SIMPLE y segura
                         navController.navigate(route) {
-                            popUpTo(navController.graph.startDestinationId) { saveState = true }
                             launchSingleTop = true
                             restoreState = true
                         }
@@ -56,7 +57,7 @@ fun AppRoot(
             cartViewModelFactory = cartViewModelFactory,
             cartViewModel = cartViewModel,
             modifier = Modifier.padding(inner),
-            startDestination = Routes.Login.route // o Routes.Catalogo.route si ya hay sesión
+            startDestination = Routes.Login.route
         )
     }
 }
