@@ -36,6 +36,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
+import com.abs.huerto_hogar_appmovil.ui.screens.ContactoScreen
+import com.abs.huerto_hogar_appmovil.ui.screens.HomeScreen
+import com.abs.huerto_hogar_appmovil.ui.screens.NosotrosScreen
+import com.abs.huerto_hogar_appmovil.ui.screens.AdminScreen
 
 @Composable
 fun AppNavGraph(
@@ -68,7 +72,7 @@ fun AppNavGraph(
                 viewModel = loginViewModel,
                 onRegistroClick = { navController.navigate(Routes.Registro.route) },
                 onLoginOk = {
-                    navController.navigate(Routes.Catalogo.route) {
+                    navController.navigate(Routes.Home.route) {
                         popUpTo(Routes.Login.route) { inclusive = true }
                         launchSingleTop = true
                     }
@@ -96,6 +100,35 @@ fun AppNavGraph(
                 onIrALogin = { navController.popBackStack() }
             )
         }
+        composable(Routes.Home.route) {
+            HomeScreen(
+                onIrCatalogo = { navController.navigate(Routes.Catalogo.route) },
+                onIrNosotros = { navController.navigate(Routes.Nosotros.route) },
+                onIrContacto = { navController.navigate(Routes.Contacto.route) },
+                onIrAdmin = { navController.navigate(Routes.AdminScreen.route) }
+            )
+        }
+        composable(Routes.Nosotros.route) {
+            NosotrosScreen(
+                onBack = { navController.popBackStack() }
+            )
+        }
+        composable(Routes.Contacto.route) {
+            ContactoScreen(
+                onBack = { navController.popBackStack() }
+            )
+        }
+        composable(Routes.AdminScreen.route) {
+            AdminScreen(
+                productoRepository = productoRepository,
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+
+
+
+
 
         composable(Routes.Catalogo.route) {
             CatalogoScreen(
