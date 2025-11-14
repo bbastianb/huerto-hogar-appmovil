@@ -19,7 +19,8 @@ fun AppRoot(
     productoRepository: ProductoRepository,
     catalogoViewModelFactory: ViewModelProvider.Factory,
     cartViewModelFactory: ViewModelProvider.Factory,
-    cartViewModel: CartViewModel
+    cartViewModel: CartViewModel,
+    checkoutViewModelFactory: ViewModelProvider.Factory
 ) {
     val navController = rememberNavController()
     val cartCount by cartViewModel.totalItems.collectAsState()
@@ -56,8 +57,10 @@ fun AppRoot(
             catalogoViewModelFactory = catalogoViewModelFactory,
             cartViewModelFactory = cartViewModelFactory,
             cartViewModel = cartViewModel,
+            checkoutViewModelFactory= checkoutViewModelFactory,
             modifier = Modifier.padding(inner),
-            startDestination = Routes.Login.route
+            startDestination = Routes.Login.route // o Routes.Catalogo.route si ya hay sesión,
+
         )
     }
 }

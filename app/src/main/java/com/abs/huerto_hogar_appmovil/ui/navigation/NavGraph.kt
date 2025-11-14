@@ -1,9 +1,23 @@
 package com.abs.huerto_hogar_appmovil.ui.navigation
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -13,6 +27,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 
 import com.abs.huerto_hogar_appmovil.data.repository.UsuarioRepository
 import com.abs.huerto_hogar_appmovil.data.repository.ProductoRepository
@@ -28,6 +43,8 @@ import com.abs.huerto_hogar_appmovil.ui.viewmodels.CartViewModel
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.DetalleProductoViewModel
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.DetalleProductoViewModelFactory
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.LoginViewModel
+import com.abs.huerto_hogar_appmovil.ui.screens.CheckoutScreen
+import com.abs.huerto_hogar_appmovil.ui.viewmodels.CheckoutViewModel
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -45,7 +62,7 @@ import com.abs.huerto_hogar_appmovil.ui.screens.AdminScreen
 fun AppNavGraph(
     navController: NavHostController,
     usuarioRepository: UsuarioRepository,
-
+    checkoutViewModelFactory: ViewModelProvider.Factory,
     catalogoViewModelFactory: ViewModelProvider.Factory,
     cartViewModelFactory: ViewModelProvider.Factory,
     productoRepository: ProductoRepository,
@@ -175,25 +192,20 @@ fun AppNavGraph(
         }
 
         composable(Routes.Checkout.route) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("💰 Checkout", style = MaterialTheme.typography.headlineMedium)
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text("Procesando compra...")
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Button(onClick = {
-                        navController.popBackStack(Routes.Catalogo.route, false)
-                    }) {
-                        Text("Volver al Catálogo")
+            val checkoutViewModel: CheckoutViewModel =
+                viewModel(factory = checkoutViewModelFactory)
+
+            CheckoutScreen(
+                onBackClick = { navController.popBackStack() },
+                onOrderComplete = {
+                    navController.navigate(Routes.Catalogo.route) {
+                        popUpTo(Routes.Catalogo.route) { inclusive = true }
                     }
-                }
-            }
+                },
+                viewModel = checkoutViewModel
+            )
         }
     }
 }
+
 
