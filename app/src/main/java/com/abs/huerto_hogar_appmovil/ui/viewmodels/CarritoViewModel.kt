@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 
 class CartViewModel(private val repository: CarritoRepository) : ViewModel() {
 
-    // STATE FLOWS
+
     private val _carritoItems = MutableStateFlow<List<CarritoDao.CarritoConProducto>>(emptyList())
     val carritoItems: StateFlow<List<CarritoDao.CarritoConProducto>> = _carritoItems.asStateFlow()
 
@@ -53,7 +53,6 @@ class CartViewModel(private val repository: CarritoRepository) : ViewModel() {
             }
         }
     }
-    // En CartViewModel.kt - agrega este método
     fun agregarAlCarrito(productoId: String, cantidad: Int) {
         viewModelScope.launch {
             println("🛒 Agregando producto $productoId al carrito, cantidad: $cantidad")
@@ -72,14 +71,12 @@ class CartViewModel(private val repository: CarritoRepository) : ViewModel() {
                 _mensaje.value = "❌ Error al agregar el producto"
             }
 
-            // Limpiar mensaje después de 3 segundos
             launch {
                 delay(3000)
                 _mensaje.value = ""
             }
         }
     }
-    // MÉTODOS DEL CARRITO
 
     fun actualizarCantidad(itemId: Long, nuevaCantidad: Int) {
         viewModelScope.launch {

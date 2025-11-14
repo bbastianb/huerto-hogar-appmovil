@@ -43,7 +43,6 @@ class CheckoutViewModel(
     private val _ordenCreada = MutableStateFlow(false)
     val ordenCreada: StateFlow<Boolean> = _ordenCreada.asStateFlow()
 
-    // Carrito + totales
     val carritoItems = carritoRepository.obtenerCarrito()
 
     private val _subtotal = MutableStateFlow(0.0)
@@ -52,7 +51,6 @@ class CheckoutViewModel(
     private val _totalPedido = MutableStateFlow(0.0)
     val totalPedido: StateFlow<Double> = _totalPedido.asStateFlow()
 
-    // VALIDACIÓN
     private val _puedeProcesarPedido = MutableStateFlow(false)
     val puedeProcesarPedido: StateFlow<Boolean> = _puedeProcesarPedido.asStateFlow()
 
@@ -60,7 +58,6 @@ class CheckoutViewModel(
     val erroresValidacion: StateFlow<List<String>> = _erroresValidacion.asStateFlow()
 
     init {
-        // Recalcular totales cuando se modifica el carrito
         viewModelScope.launch {
             carritoRepository.obtenerCarrito().collect { items ->
                 val nuevoSubtotal = items.sumOf { it.producto.precio * it.carrito.cantidad }
@@ -68,7 +65,6 @@ class CheckoutViewModel(
                 _totalPedido.value = nuevoSubtotal // envío gratis por ahora
             }
         }
-        // Validar estado inicial
         validarCheckout(_checkoutInfo.value)
     }
 
@@ -126,7 +122,6 @@ class CheckoutViewModel(
                     correoContacto = info.email
                 )
 
-                // Por simplicidad, usamos 0L y dejamos al repositorio manejar el ID real
                 val pedidoItems = items.map { carritoItem ->
                     PedidoItem(
                         pedidoId = pedido.id,
@@ -138,10 +133,8 @@ class CheckoutViewModel(
                     )
                 }
 
-                // Guardar en Room
                 pedidoRepository.crearPedido(pedido, pedidoItems)
 
-                // Actualizar stock
                 items.forEach { item ->
                     val nuevoStock = item.producto.stock - item.carrito.cantidad
                     if (nuevoStock >= 0) {
@@ -149,7 +142,6 @@ class CheckoutViewModel(
                     }
                 }
 
-                // Vaciar carrito
                 carritoRepository.vaciarCarrito()
 
                 _mensaje.value = "Pedido creado exitosamente"

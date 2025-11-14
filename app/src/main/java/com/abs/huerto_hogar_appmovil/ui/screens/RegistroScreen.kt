@@ -71,6 +71,9 @@ fun RegistroScreen(
                 color = MaterialTheme.colorScheme.onBackground
             )
 
+
+
+
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),

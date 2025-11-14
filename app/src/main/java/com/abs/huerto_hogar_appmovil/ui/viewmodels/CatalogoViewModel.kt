@@ -12,7 +12,6 @@ import kotlinx.coroutines.launch
 
 class CatalogoViewModel(private val repository: ProductoRepository,private val carritoRepository: CarritoRepository) : ViewModel() {
 
-    // STATE FLOWS para la UI
     private val _productos = MutableStateFlow<List<Producto>>(emptyList())
     val productos: StateFlow<List<Producto>> = _productos.asStateFlow()
 
@@ -27,20 +26,18 @@ class CatalogoViewModel(private val repository: ProductoRepository,private val c
             println("🛒 Agregando producto $productoId al carrito")
             val exito = carritoRepository.agregarAlCarrito(productoId, 1)
             if (exito) {
-                println("✅ Producto agregado al carrito")
+                println(" Producto agregado al carrito")
             } else {
-                println("❌ Error al agregar al carrito - Stock insuficiente")
+                println(" Error al agregar al carrito - Stock insuficiente")
             }
         }
     }
 
-    // MÉTODOS DE CAMBIO (SET)
     fun onCategoriaChange(nuevaCategoria: String) {
         _categoria.value = nuevaCategoria
         cargarProductosPorCategoria(nuevaCategoria)
     }
 
-    // INICIALIZACIÓN
     init {
         cargarProductosIniciales()
         observarProductos()
@@ -75,7 +72,6 @@ class CatalogoViewModel(private val repository: ProductoRepository,private val c
         }
     }
 
-    // BUSCAR PRODUCTOS
     fun onBuscarChange(query: String) {
         viewModelScope.launch {
             if (query.length >= 2) {

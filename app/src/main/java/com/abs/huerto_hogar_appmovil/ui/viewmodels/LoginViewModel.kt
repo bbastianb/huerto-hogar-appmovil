@@ -30,6 +30,11 @@ class LoginViewModel(private val usuarioRepository: UsuarioRepository): ViewMode
     private val _usuarioLogueado = MutableStateFlow<Usuario?>(null)
     val usuarioLogueado: StateFlow<Usuario?> = _usuarioLogueado.asStateFlow()
 
+    private val _loginExitosoUsuario = MutableStateFlow(false)
+    val loginExitosoUsuario: StateFlow<Boolean> = _loginExitosoUsuario.asStateFlow()
+
+    private val _loginExitosoAdmin = MutableStateFlow(false)
+    val loginExitosoAdmin: StateFlow<Boolean> = _loginExitosoAdmin.asStateFlow()
 
     fun onCorreoChange(nuevoCorreo: String) {
         _correo.value = nuevoCorreo
@@ -78,6 +83,19 @@ class LoginViewModel(private val usuarioRepository: UsuarioRepository): ViewMode
                 if (usuario != null) {
                     _usuarioLogueado.value = usuario
                     _loginSuccess.value = true
+
+                    when (usuario.rol) {
+                        "admin" -> {
+                            _loginExitosoAdmin.value = true
+                        }
+                        "usuario" -> {
+                            _loginExitosoUsuario.value = true
+                        }
+                        else -> {
+                            _errorMessage.value = "Rol de usuario no válido"
+                        }
+                    }
+
                     limpiarCampos()
                 } else {
                     _errorMessage.value = "Correo o contraseña incorrectos"
