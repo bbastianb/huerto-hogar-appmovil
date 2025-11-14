@@ -66,6 +66,21 @@ dependencies {
     implementation("androidx.compose.material3:material3")
 
     implementation("androidx.compose.material:material-icons-extended")
+    //Location
+    implementation("com.google.android.gms:play-services-location:21.0.1") // Usa la última versión
+    // Para usar .await() con tasks de Google Play Services en coroutines
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.8.0")
+
+    implementation("androidx.activity:activity-compose:1.9.3")
+    implementation("androidx.compose.ui:ui:1.7.3")
+    implementation("androidx.compose.material3:material3:1.3.0")
+
+    implementation("androidx.core:core-ktx:1.12.0") // Usa la última versión
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0") // Usa la última versión
+    
+
+
+
 
 
     implementation("androidx.emoji2:emoji2:1.4.0")//eliminar sola para antes de agregar fotos

@@ -16,10 +16,12 @@ import com.abs.huerto_hogar_appmovil.data.repository.ProductoRepository
 import com.abs.huerto_hogar_appmovil.data.repository.UsuarioRepository
 import com.abs.huerto_hogar_appmovil.ui.navigation.AppRoot
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.abs.huerto_hogar_appmovil.data.repository.PedidoRepository
 import com.abs.huerto_hogar_appmovil.ui.navigation.AppRoot
 import com.abs.huerto_hogar_appmovil.ui.theme.HuertohogarappmovilTheme
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.CartViewModel
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.CatalogoViewModel
+import com.abs.huerto_hogar_appmovil.ui.viewmodels.CheckoutViewModel
 
 class MainActivity : ComponentActivity() {
 
@@ -31,11 +33,15 @@ class MainActivity : ComponentActivity() {
             applicationContext,
             AppDatabase::class.java,
             "huerto_hogar_database"
-        ).build()
+        )
+            .fallbackToDestructiveMigration()
+            .build()
 
         val productoRepository = ProductoRepository(database.productoDao())
         val carritoRepository  = CarritoRepository(database.carritoDao(), productoRepository)
         val usuarioRepository  = UsuarioRepository()
+        val pedidoRepository  = PedidoRepository(database.pedidoDao())
+        val pedidoDao = database.pedidoDao()
 
 
         val catalogoViewModelFactory = object : ViewModelProvider.Factory {
@@ -50,6 +56,15 @@ class MainActivity : ComponentActivity() {
                 return CartViewModel(carritoRepository) as T
             }
         }
+
+        val checkoutViewModelFactory = object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return CheckoutViewModel(
+                    pedidoRepository = pedidoRepository,
+                    carritoRepository = carritoRepository,
+                    productoRepository = productoRepository) as T
+            }
+        }
         setContent {
             HuertohogarappmovilTheme {
                 Surface {
@@ -61,7 +76,8 @@ class MainActivity : ComponentActivity() {
                         productoRepository = productoRepository,
                         catalogoViewModelFactory = catalogoViewModelFactory,
                         cartViewModelFactory = cartViewModelFactory,
-                        cartViewModel = cartViewModel
+                        cartViewModel = cartViewModel,
+                        checkoutViewModelFactory = checkoutViewModelFactory
                     )
                 }
             }
