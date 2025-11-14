@@ -26,12 +26,12 @@ class UsuarioRepository {
                 nombre = "María",
                 apellido = "González",
                 correo = "maria@gmail.com",
-                contrasenna = "abcd",
+                contrasenna = "1234",
                 fono = 987654321,
                 direccion = "Calle Secundaria 456",
                 comuna = "Providencia",
                 region = "Metropolitana",
-                rol = "usuario"
+                rol = "admin"
             )
         )
     }

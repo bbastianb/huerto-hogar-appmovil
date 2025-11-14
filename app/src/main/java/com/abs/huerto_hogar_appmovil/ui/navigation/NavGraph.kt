@@ -1,23 +1,7 @@
 package com.abs.huerto_hogar_appmovil.ui.navigation
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
+
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -27,36 +11,28 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 
-import com.abs.huerto_hogar_appmovil.data.repository.UsuarioRepository
 import com.abs.huerto_hogar_appmovil.data.repository.ProductoRepository
-
-import com.abs.huerto_hogar_appmovil.ui.screens.LoginScreen
-import com.abs.huerto_hogar_appmovil.ui.screens.registro.RegistroScreen
-import com.abs.huerto_hogar_appmovil.ui.screens.CatalogoScreen
+import com.abs.huerto_hogar_appmovil.data.repository.UsuarioRepository
+import com.abs.huerto_hogar_appmovil.ui.screens.AdminScreen
 import com.abs.huerto_hogar_appmovil.ui.screens.CarritoScreen
+import com.abs.huerto_hogar_appmovil.ui.screens.CatalogoScreen
+import com.abs.huerto_hogar_appmovil.ui.screens.ContactoScreen
 import com.abs.huerto_hogar_appmovil.ui.screens.DetalleProductoScreen
+import com.abs.huerto_hogar_appmovil.ui.screens.HomeScreen
+import com.abs.huerto_hogar_appmovil.ui.screens.LoginScreen
+import com.abs.huerto_hogar_appmovil.ui.screens.NosotrosScreen
+import com.abs.huerto_hogar_appmovil.ui.screens.registro.RegistroScreen
+import com.abs.huerto_hogar_appmovil.ui.screens.CheckoutScreen
+import com.abs.huerto_hogar_appmovil.ui.screens.ListadoUsuariosScreen
 
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.RegistroViewModel
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.CartViewModel
+import com.abs.huerto_hogar_appmovil.ui.viewmodels.CheckoutViewModel
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.DetalleProductoViewModel
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.DetalleProductoViewModelFactory
+import com.abs.huerto_hogar_appmovil.ui.viewmodels.ListadoUsersViewModel
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.LoginViewModel
-import com.abs.huerto_hogar_appmovil.ui.screens.CheckoutScreen
-import com.abs.huerto_hogar_appmovil.ui.viewmodels.CheckoutViewModel
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.unit.dp
-import com.abs.huerto_hogar_appmovil.ui.screens.ContactoScreen
-import com.abs.huerto_hogar_appmovil.ui.screens.HomeScreen
-import com.abs.huerto_hogar_appmovil.ui.screens.NosotrosScreen
-import com.abs.huerto_hogar_appmovil.ui.screens.AdminScreen
 
 @Composable
 fun AppNavGraph(
@@ -88,8 +64,14 @@ fun AppNavGraph(
             LoginScreen(
                 viewModel = loginViewModel,
                 onRegistroClick = { navController.navigate(Routes.Registro.route) },
-                onLoginOk = {
+                onLoginExitosoUsuario = {
                     navController.navigate(Routes.Home.route) {
+                        popUpTo(Routes.Login.route) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                },
+                onLoginExitosoAdmin = {
+                    navController.navigate(Routes.AdminScreen.route){
                         popUpTo(Routes.Login.route) { inclusive = true }
                         launchSingleTop = true
                     }
@@ -142,21 +124,32 @@ fun AppNavGraph(
             )
         }
 
-
-
-
-
-
         composable(Routes.Catalogo.route) {
             CatalogoScreen(
                 viewModel = viewModel(factory = catalogoViewModelFactory),
                 onCartClick = { navController.navigate(Routes.Carrito.route) },
                 onProductClick = { productoId ->
                     navController.navigate(Routes.DetalleProducto.build(productoId))
-                },onAddToCart = { id, cantidad ->
+                }, onBackClick = {navController.popBackStack()},
+                onAddToCart = { id, cantidad ->
                     cartViewModel.agregarAlCarrito(id, cantidad)
                 }
 
+            )
+        }
+
+        composable(Routes.ListadoUsers.route) {
+            val listadoUsersViewModel: ListadoUsersViewModel = viewModel(
+                factory = object : ViewModelProvider.Factory {
+                    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                        @Suppress("UNCHECKED_CAST")
+                        return ListadoUsersViewModel(usuarioRepository) as T
+                    }
+                }
+            )
+
+            ListadoUsuariosScreen( // ← Usa el nombre correcto de tu composable
+                viewModel = listadoUsersViewModel
             )
         }
 
@@ -173,7 +166,6 @@ fun AppNavGraph(
             )
 
         }
-
         composable(
             route = Routes.DetalleProducto.route,
             arguments = listOf(navArgument("productoId") { type = NavType.StringType })
@@ -208,4 +200,8 @@ fun AppNavGraph(
     }
 }
 
+@Composable
+fun ListadoUsersScreen(usuarioRepository: UsuarioRepository, onBack: () -> Boolean) {
+    TODO("Not yet implemented")
+}
 

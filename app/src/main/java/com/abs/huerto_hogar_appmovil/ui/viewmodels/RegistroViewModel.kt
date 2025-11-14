@@ -1,5 +1,6 @@
 package com.abs.huerto_hogar_appmovil.ui.viewmodels
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.abs.huerto_hogar_appmovil.data.model.Usuario
@@ -12,6 +13,9 @@ import kotlinx.coroutines.launch
 class RegistroViewModel(private val usuarioRepository: UsuarioRepository) : ViewModel() {
 
     /* Definimos los val de los campos */
+
+    private val _fotoUri = MutableStateFlow<Uri?>(null)
+    val fotoUri: StateFlow<Uri?> = _fotoUri.asStateFlow()
     private val _nombre = MutableStateFlow("")
     val nombre: StateFlow<String> = _nombre.asStateFlow()
 
@@ -52,6 +56,10 @@ class RegistroViewModel(private val usuarioRepository: UsuarioRepository) : View
 
 
     /* Funciones de cambio "Cambios de los textfield" */
+
+    fun onFotoCapturada(uri: Uri) {
+        _fotoUri.value = uri
+    }
 
     fun onNombreChange(nuevoNombre: String) {
         _nombre.value = nuevoNombre
@@ -98,6 +106,8 @@ class RegistroViewModel(private val usuarioRepository: UsuarioRepository) : View
         _errorMessage.value = null
     }
 
+
+
     /* Mi funcion para las ext de los correos */
     private fun isValidCorreo(correo: String): Boolean {
         val correoLowerCase = correo.trim().lowercase()
@@ -118,6 +128,7 @@ class RegistroViewModel(private val usuarioRepository: UsuarioRepository) : View
         _direccion.value = ""
         _comuna.value = ""
         _region.value = ""
+        _fotoUri.value = null
         _errorMessage.value = null
     }
 

@@ -46,6 +46,7 @@ dependencies {
     implementation(libs.androidx.compose.runtime)
     implementation(libs.androidx.compose.ui.text)
     implementation(libs.androidx.compose.foundation)
+    implementation(libs.play.services.maps)
     // Room
     val roomVersion = "2.8.1" // Usa la versión más reciente
     implementation("androidx.room:room-runtime:$roomVersion")
@@ -81,6 +82,17 @@ dependencies {
 
 
 
+
+    //Dependencia para la camara
+    implementation("androidx.camera:camera-camera2:1.5.0")
+    implementation("androidx.camera:camera-lifecycle:1.5.0")
+    implementation("androidx.camera:camera-view:1.5.0")
+    // Para la vista previa en compose (o usa AndroidView)
+    implementation("androidx.camera:camera-compose:1.0.0-alpha02")
+    // Para manejar los permisos fácilmente
+    implementation("com.google.accompanist:accompanist-permissions:0.34.0")
+    // Dependencia para cargar la imagen después de ser capturada
+    implementation("io.coil-kt:coil-compose:2.1.0")
 
 
     implementation("androidx.emoji2:emoji2:1.4.0")//eliminar sola para antes de agregar fotos

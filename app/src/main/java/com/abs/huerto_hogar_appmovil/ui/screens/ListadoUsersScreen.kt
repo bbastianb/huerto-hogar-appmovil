@@ -90,7 +90,7 @@ fun ListadoUsuariosScreen(
             TopAppBar(
                 title = {
                     Text(
-                        "LISTADO DE USUARIOS",
+                        "Listado De Usuarios",
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.fillMaxWidth()

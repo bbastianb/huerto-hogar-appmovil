@@ -59,7 +59,7 @@ fun HomeScreen(
                 style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold)
             )
             Text(
-                text = "Catálogo y administración",
+                text = "Bienvenido",
                 style = MaterialTheme.typography.bodyMedium
             )
         }
@@ -87,7 +87,6 @@ fun HomeScreen(
                 }
             }
         }
-
         // 2) Botones de navegación
         Column(
             verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -118,6 +117,13 @@ fun HomeScreen(
                 Text("Admin")
             }
         }
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        Text(
+            text = "Productos Recomendados",
+            style = MaterialTheme.typography.bodyMedium
+        )
 
         // 3) Cards de productos abajo de los botones
         Column(

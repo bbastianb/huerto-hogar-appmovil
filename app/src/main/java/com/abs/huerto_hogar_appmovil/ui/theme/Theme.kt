@@ -18,7 +18,7 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
 private val LightColorScheme = lightColorScheme(
-    primary = Color(0xFF2E8B57), // Verde Esmeralda
+    primary = Color(0xFF348537), // Verde Esmeralda
     onPrimary = Color(0xFFFFFFFF),
     primaryContainer = Color(0xFFA8D5BA),
     onPrimaryContainer = Color(0xFF00210E),
@@ -28,7 +28,7 @@ private val LightColorScheme = lightColorScheme(
     secondaryContainer =Color(0xFFFFF0A8),
     onSecondaryContainer =Color(0xFF241A00),
 
-    tertiary =Color(0xFF8B4513), // Marrón Claro
+    tertiary =Color(0xFF000000), // Marrón Claro
     onTertiary =Color(0xFFFFFFFF),
     tertiaryContainer =Color(0xFFFFDCC2),
     onTertiaryContainer =Color(0xFF301400),
@@ -42,11 +42,12 @@ private val LightColorScheme = lightColorScheme(
     onSurfaceVariant =Color(0xFF424941),
 
     outline =Color(0xFF727970),
-    outlineVariant =Color(0xFFC1C9BE)
+    outlineVariant =Color(0xFFC1C9BE),
+
 )
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Color(0xFF4CAF50),        // Verde más claro para dark mode
+    primary = Color(0xFF348537),        // Verde más claro para dark mode
     onPrimary = Color(0xFF282828),
     primaryContainer = Color(0xFF2E7D32),
     onPrimaryContainer = Color(0xFFFFFFFF),
@@ -56,6 +57,7 @@ private val DarkColorScheme = darkColorScheme(
     secondaryContainer = Color(0xFFF57C00),
     onSecondaryContainer = Color(0xFFFFFFFF),
 
+    tertiary = Color(0xFFFFFFFF),
     background = Color(0xFF333131),     // Fondo oscuro
     onBackground = Color(0xFFFFFFFF),   // Texto blanco
 

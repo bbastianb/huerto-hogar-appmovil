@@ -8,7 +8,6 @@ import androidx.compose.runtime.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -37,23 +36,45 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.abs.huerto_hogar_appmovil.R
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.LoginViewModel
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 
 @Composable
 fun LoginScreen(
-    onLoginOk: () -> Unit = {},
+    onLoginExitosoUsuario: () -> Unit = {},
+    onLoginExitosoAdmin: () -> Unit = {},
     onRegistroClick: () -> Unit = {},
-    viewModel: LoginViewModel
+    viewModel: LoginViewModel,
 ) {
     val correo by viewModel.correo.collectAsStateWithLifecycle()
     val contrasenna by viewModel.contrasenna.collectAsStateWithLifecycle()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val errorMessage by viewModel.errorMessage.collectAsStateWithLifecycle()
     val loginSuccess by viewModel.loginSuccess.collectAsStateWithLifecycle()
+    val loginExitosoUsuario by viewModel.loginExitosoUsuario.collectAsStateWithLifecycle()
+    val loginExitosoAdmin by viewModel.loginExitosoAdmin.collectAsStateWithLifecycle()
 
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
+
+        if (loginExitosoUsuario) {
+            LaunchedEffect(Unit) {
+                onLoginExitosoUsuario()
+                viewModel.resetLoginSuccess()
+            }
+        }
+
+        if (loginExitosoAdmin) {
+            LaunchedEffect(Unit) {
+                onLoginExitosoAdmin()
+                viewModel.resetLoginSuccess()
+            }
+        }
+
+
         if (isLoading) {
             Box(
                 modifier = Modifier.fillMaxSize(),
@@ -78,17 +99,11 @@ fun LoginScreen(
             return@Surface
         }
 
-        if (loginSuccess) {
-            LaunchedEffect(Unit) {
-                onLoginOk()
-                viewModel.resetLoginSuccess()
-            }
-        }
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 24.dp),
+                .padding(horizontal = 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
@@ -104,7 +119,7 @@ fun LoginScreen(
                 modifier = Modifier.size(185.dp)
             )
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
             Text(
                 "Bienvenido",
@@ -113,7 +128,14 @@ fun LoginScreen(
                 color = MaterialTheme.colorScheme.onBackground
             )
 
-            Spacer(modifier = Modifier.height(15.dp))
+            Text(
+                "Conecta con la frescura del campo",
+                fontSize = 14.sp,
+                color = MaterialTheme.colorScheme.onBackground,
+                fontWeight = FontWeight.Normal,
+                modifier = Modifier.padding(top = 4.dp)
+            )
+            Spacer(modifier = Modifier.height(32.dp))
 
             // Textfiedl de Correo
             OutlinedTextField(
@@ -136,10 +158,11 @@ fun LoginScreen(
                     Icon(Icons.Default.Person, contentDescription = "Icono de email")
                 },
                 singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                shape = RoundedCornerShape(12.dp)
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
             // Textfiedl Contraseña
             OutlinedTextField(
@@ -161,9 +184,9 @@ fun LoginScreen(
                 leadingIcon = {
                     Icon(Icons.Default.Lock, contentDescription = "Icono de contraseña")
                 },
-                singleLine = true,
-                visualTransformation = PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+                visualTransformation = PasswordVisualTransformation(),                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                shape = RoundedCornerShape(12.dp)
             )
 
             // Mensaje de error
@@ -177,7 +200,7 @@ fun LoginScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
             // Btn de Ingresar
             Button(

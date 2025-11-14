@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModelProvider
 
 import com.abs.huerto_hogar_appmovil.data.repository.ProductoRepository
 import com.abs.huerto_hogar_appmovil.data.repository.UsuarioRepository
+import com.abs.huerto_hogar_appmovil.ui.components.AdminBottomBar
 import com.abs.huerto_hogar_appmovil.ui.components.HuertoBottomBar
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.CartViewModel
 
@@ -25,13 +26,21 @@ fun AppRoot(
     val navController = rememberNavController()
     val cartCount by cartViewModel.totalItems.collectAsState()
 
+
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
+
+    val isAdminRoute = currentRoute in listOf(
+        Routes.AdminScreen.route,
+        Routes.ListadoUsers.route
+    )
+
     val hideBottomBar =
         (currentRoute?.startsWith("detalle_producto/") == true) ||
                 currentRoute == Routes.Checkout.route ||
                 currentRoute == Routes.Login.route ||
                 currentRoute == Routes.Registro.route ||
-                currentRoute == Routes.AdminScreen.route
+                isAdminRoute
+    val showAdminBottomBar = isAdminRoute
 
     Scaffold(
         bottomBar = {
@@ -46,6 +55,18 @@ fun AppRoot(
                         }
                     },
                     cartCount = cartCount
+                )
+            }else if (showAdminBottomBar) {
+                AdminBottomBar(
+                    selectedRoute = currentRoute,
+                    onNavigate = { route ->
+                        navController.navigate(route){
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+
+                    }
+
                 )
             }
         }

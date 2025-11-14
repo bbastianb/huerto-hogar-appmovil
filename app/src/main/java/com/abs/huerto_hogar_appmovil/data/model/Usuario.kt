@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "usuarios" ,  indices = [Index(value = ["correo"], unique = true)])
 data class Usuario(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0L,
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val nombre : String,
     val apellido : String,
     val correo : String,
@@ -15,5 +15,6 @@ data class Usuario(
     val direccion : String,
     val comuna : String,
     val region : String,
-    val rol : String
+    val rol : String,
+    //val fotoUri : String? = null //Url de la foto//
 )
