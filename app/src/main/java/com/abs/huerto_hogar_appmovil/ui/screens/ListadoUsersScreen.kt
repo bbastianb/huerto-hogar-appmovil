@@ -19,6 +19,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -48,6 +49,8 @@ fun ListadoUsuariosScreen(
     val errorMessage by viewModel.errorMessage.collectAsStateWithLifecycle()
     val mostrarDialogo by viewModel.mostrarDialogo.collectAsStateWithLifecycle()
     val usuarioParaEliminar by viewModel.usuarioParaEliminar.collectAsStateWithLifecycle()
+    val textoBusqueda by viewModel.textoBusqueda.collectAsStateWithLifecycle()
+    val ordenarPor by viewModel.ordenarPor.collectAsStateWithLifecycle()
 
     if (mostrarDialogo) {
         AlertDialog(
@@ -86,22 +89,6 @@ fun ListadoUsuariosScreen(
     }
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        "Listado De Usuarios",
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary
-                )
-            )
-        }
     ) { paddingValues ->
         Surface(
             modifier = Modifier
@@ -109,102 +96,124 @@ fun ListadoUsuariosScreen(
                 .padding(paddingValues),
             color = MaterialTheme.colorScheme.background
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp)
-            ) {
-                // Loading
-                if (isLoading) {
-                    Column(
-                        modifier = Modifier.fillMaxSize(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
+            Column (modifier = Modifier.fillMaxSize()){
+                OutlinedTextField(
+                value = textoBusqueda,
+                    onValueChange = { viewModel.actualizarTextoBusqueda(it) },
+                    label = { Text("Buscar usuarios...") },
+                    placeholder = { Text("Nombre, apellido, email, región") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    singleLine = true
+                    )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp)
                     ) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(48.dp),
-                            color = MaterialTheme.colorScheme.primary,
-                            strokeWidth = 4.dp
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text(
-                            text = "Cargando usuarios...",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onBackground
-                        )
-                    }
-                    return@Box
-                }
-
-                errorMessage?.let { error ->
-                    Column(
-                        modifier = Modifier.fillMaxSize(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Card(
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.errorContainer
-                            ),
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
+                        if (isLoading) {
                             Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally
+                                modifier = Modifier.fillMaxSize(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(48.dp),
+                                    color = MaterialTheme.colorScheme.primary,
+                                    strokeWidth = 4.dp
+                                )
+                                Spacer(modifier = Modifier.height(16.dp))
+                                Text(
+                                    text = "Cargando usuarios...",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onBackground
+                                )
+                            }
+                            return@Box
+                        }
+
+                        errorMessage?.let { error ->
+                            Column(
+                                modifier = Modifier.fillMaxSize(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                Card(
+                                    colors = CardDefaults.cardColors(
+                                        containerColor = MaterialTheme.colorScheme.errorContainer
+                                    ),
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(16.dp),
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ) {
+                                        Text(
+                                            text = "Error",
+                                            fontWeight = FontWeight.Bold,
+                                            color = MaterialTheme.colorScheme.onErrorContainer
+                                        )
+                                        Text(
+                                            text = error,
+                                            color = MaterialTheme.colorScheme.onErrorContainer,
+                                            textAlign = TextAlign.Center,
+                                            modifier = Modifier.padding(top = 8.dp)
+                                        )
+                                        Button(
+                                            onClick = { viewModel.clearError() },
+                                            modifier = Modifier.padding(top = 16.dp),
+                                            colors = ButtonDefaults.buttonColors(
+                                                containerColor = MaterialTheme.colorScheme.primary,
+                                                contentColor = MaterialTheme.colorScheme.onPrimary
+                                            )
+                                        ) {
+                                            Text("Reintentar")
+                                        }
+                                    }
+                                }
+                            }
+                            return@Box
+                        }
+
+                        if (usuarios.isEmpty()) {
+                            Column(
+                                modifier = Modifier.fillMaxSize(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
                             ) {
                                 Text(
-                                    text = "Error",
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.onErrorContainer
+                                    text = if (textoBusqueda.isNotBlank()){
+                                        "No se encontraron usuarios con '$textoBusqueda'"
+                                    }else  {
+                                        "No hay usuarios registrados"
+                                    },
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
-                                Text(
-                                    text = error,
-                                    color = MaterialTheme.colorScheme.onErrorContainer,
-                                    textAlign = TextAlign.Center,
-                                    modifier = Modifier.padding(top = 8.dp)
-                                )
-                                Button(
-                                    onClick = { viewModel.clearError() },
-                                    modifier = Modifier.padding(top = 16.dp),
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = MaterialTheme.colorScheme.primary,
-                                        contentColor = MaterialTheme.colorScheme.onPrimary
+
+                                    Button(
+                                        onClick = { viewModel.limpiarFiltros() },
+                                        modifier = Modifier.padding(top = 16.dp)
+                                    ) {
+                                        Text("Limpiar Búsqueda")
+                                    }
+                            }
+                        } else {
+                            LazyColumn(
+                                modifier = Modifier.fillMaxSize(),
+                                verticalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                items(usuarios) { usuario ->
+                                    UsuarioCard(
+                                        usuario = usuario,
+                                        onEliminarClick = { viewModel.abrirDialogo(usuario) }
                                     )
-                                ) {
-                                    Text("Reintentar")
                                 }
                             }
                         }
-                    }
-                    return@Box
-                }
-
-                if (usuarios.isEmpty()) {
-                    Column(
-                        modifier = Modifier.fillMaxSize(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            text = "No hay usuarios registrados",
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                } else {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        items(usuarios) { usuario ->
-                            UsuarioCard(
-                                usuario = usuario,
-                                onEliminarClick = { viewModel.abrirDialogo(usuario) }
-                            )
-                        }
-                    }
                 }
             }
         }
