@@ -71,6 +71,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import kotlinx.coroutines.delay
 
+// Esta anotación dice que estamos usando funciones experimentales de Material3
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CatalogoScreen(
@@ -80,24 +81,31 @@ fun CatalogoScreen(
     onBackClick: () -> Unit = {},
     onAddToCart: (String, Int) -> Unit
 ) {
+    // Obtiene los datos del ViewModel y los convierte en estado de Compose
     val productos by viewModel.productos.collectAsState(emptyList())
     val isLoading by viewModel.isLoading.collectAsState()
     val categoriaSeleccionada by viewModel.categoria.collectAsState()
 
+    // Variables para manejar el estado de la búsqueda
     var searchQuery by remember { mutableStateOf("") }
     var isSearching by remember { mutableStateOf(false) }
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+
+    // Variables de vista rápida de producto
     var showQuickView by remember { mutableStateOf(false) }
     var selected by remember { mutableStateOf<Producto?>(null) }
 
+    // Scaffold es la estructura principal de la pantalla
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         contentWindowInsets = WindowInsets(0.dp,0.dp,0.dp,0.dp),
         topBar = {
+            // Muestra barra de búsqueda si está buscando, sino barra normal
             if (isSearching) {
                 TopAppBar(
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = MaterialTheme.colorScheme.primary,
+                        scrolledContainerColor = MaterialTheme.colorScheme.primary,
                         titleContentColor = MaterialTheme.colorScheme.onPrimary,
                     ),
                     title = {
@@ -105,7 +113,7 @@ fun CatalogoScreen(
                             value = searchQuery,
                             onValueChange = {
                                 searchQuery = it
-                                viewModel.onBuscarChange(it)
+                                viewModel.onBuscarChange(it)  // Busca en tiempo real
                             },
                             placeholder = { Text("Buscar...") },
                             modifier = Modifier.fillMaxWidth(),
@@ -143,6 +151,7 @@ fun CatalogoScreen(
                 CenterAlignedTopAppBar(
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = MaterialTheme.colorScheme.primary,
+                        scrolledContainerColor = MaterialTheme.colorScheme.primary,
                         titleContentColor = MaterialTheme.colorScheme.onPrimary,
                     ),
                     title = {
@@ -170,59 +179,23 @@ fun CatalogoScreen(
                                 tint = MaterialTheme.colorScheme.onSecondary
                             )
                         }
-//                        IconButton(onClick = onCartClick) {
-//                            Icon(
-//                                imageVector = Icons.Default.ShoppingCart,
-//                                contentDescription = "Carrito",
-//                                tint = MaterialTheme.colorScheme.onSecondary
-//                            )
-//                        }
                     },
                     scrollBehavior = scrollBehavior,
-
                 )
             }
         }
-//        floatingActionButton = {
-//            if (!isSearching) {
-//                FloatingActionButton(
-//                    onClick = onCartClick,
-//                    containerColor = MaterialTheme.colorScheme.primary
-//                ) {
-//                    Icon(
-//                        Icons.Default.ShoppingCart,
-//                        "Carrito",
-//                        tint = MaterialTheme.colorScheme.onPrimary
-//                    )
-//                }
-//            }
-//        }
     ) { innerPadding ->
+        // Muestra loading si está cargando, sino muestra el contenido
         if (isLoading) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator(
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
+            LoadingIndicator()
         } else {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding)
             ) {
+                // Si no está buscando, muestra los filtros de categoría
                 if (!isSearching) {
-//                    Spacer(modifier = Modifier.height(8.dp))
-//                    Text(
-//                        "Catálogo de Productos",
-//                        style = MaterialTheme.typography.headlineSmall,
-//                        fontWeight = FontWeight.Normal
-//                    )
-
                     CategoriaFiltro(
                         categorias = listOf("Todas", "Frutas", "Verduras", "Orgánicos", "Lácteos"),
                         categoriaSeleccionada = categoriaSeleccionada,
@@ -230,18 +203,15 @@ fun CatalogoScreen(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                 }
-                // PRODUCTOS
+
+                // Lista de productos
                 LazyColumn {
                     items(productos) { p ->
                         ProductoCard(
                             producto = p,
                             onProductClick = { id ->
-                                // si quieres que el "tocar card" abra el quick view:
                                 selected = p
                                 showQuickView = true
-
-                                // si en vez de quick view quieres navegar:
-                                // onProductClick(id)
                             },
                             onAddToCart = { id ->
                                 onAddToCart(id, 1)
@@ -250,13 +220,14 @@ fun CatalogoScreen(
                         Spacer(Modifier.height(8.dp))
                     }
                 }
+
+                // Muestra el Quick View si está activo
                 if (showQuickView && selected != null) {
                     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
                     ModalBottomSheet(
                         onDismissRequest = { showQuickView = false },
                         sheetState = sheetState
                     ) {
-                        // Contenido del quick view:
                         QuickViewProducto(
                             producto = selected!!,
                             onAdd = {
@@ -265,16 +236,17 @@ fun CatalogoScreen(
                             },
                             onVerMas = {
                                 showQuickView = false
-                                onProductClick(selected!!.id) // navegar al detalle completo si quieres
+                                onProductClick(selected!!.id)
                             }
                         )
                     }
                 }
-
             }
         }
     }
 }
+
+//mostrar vista rápida del producto
 @Composable
 fun QuickViewProducto(
     producto: Producto,
@@ -282,6 +254,7 @@ fun QuickViewProducto(
     onVerMas: () -> Unit
 ) {
     Column(Modifier.padding(16.dp)) {
+        // Imagen del producto
         Image(
             painter = painterResource(id = producto.imagen),
             contentDescription = producto.nombre,
@@ -311,6 +284,7 @@ fun QuickViewProducto(
             color = if (producto.stock > 0) MaterialTheme.colorScheme.onSurfaceVariant
             else MaterialTheme.colorScheme.error
         )
+
         Row {
             botonAddCart {
                 onAdd()
@@ -323,6 +297,7 @@ fun QuickViewProducto(
         Spacer(Modifier.height(12.dp))
     }
 }
+
 @Composable
 fun botonAddCart(onClick: () -> Unit) {
     Button(onClick = { onClick() }) {
@@ -335,6 +310,7 @@ fun botonAddCart(onClick: () -> Unit) {
         Text("Añadir al carrito")
     }
 }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CategoriaFiltro(
@@ -391,12 +367,14 @@ fun ProductoCard(
     modifier: Modifier = Modifier
 ) {
     var showMessage by remember { mutableStateOf(false) }
+
     LaunchedEffect(showMessage) {
         if (showMessage) {
             delay(2000)
             showMessage = false
         }
     }
+
     Card(
         onClick = { onProductClick(producto.id) },
         modifier = Modifier.fillMaxWidth(),
@@ -408,11 +386,10 @@ fun ProductoCard(
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
-
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
+                modifier = Modifier.fillMaxWidth()
             ) {
+                // Imagen del producto
                 Box(
                     modifier = Modifier
                         .size(80.dp)
@@ -420,7 +397,6 @@ fun ProductoCard(
                         .background(MaterialTheme.colorScheme.surfaceVariant),
                     contentAlignment = Alignment.Center
                 ) {
-
                     Image(
                         painter = painterResource(id = producto.imagen),
                         contentDescription = producto.nombre,
@@ -434,10 +410,10 @@ fun ProductoCard(
 
                 Spacer(modifier = Modifier.width(16.dp))
 
+                // Información del producto
                 Column(
                     modifier = Modifier.weight(1f)
                 ) {
-
                     Text(
                         text = producto.nombre,
                         style = MaterialTheme.typography.titleMedium,
@@ -448,16 +424,7 @@ fun ProductoCard(
 
                     Spacer(modifier = Modifier.height(4.dp))
 
-//                    Text(
-//                        text = producto.descripcion,
-//                        style = MaterialTheme.typography.bodySmall,
-//                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-//                        maxLines = 2,
-//                        overflow = TextOverflow.Ellipsis
-//                    )
-//
-//                    Spacer(modifier = Modifier.height(8.dp))
-
+                    // Precio y medida
                     Row(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -475,21 +442,13 @@ fun ProductoCard(
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
-
-                        Spacer(modifier = Modifier.width(8.dp))
-//
-//                        Text(
-//                            text = "Stock: ${producto.stock}",
-//                            style = MaterialTheme.typography.bodySmall,
-//                            color = if (producto.stock > 0) MaterialTheme.colorScheme.onSurfaceVariant
-//                            else MaterialTheme.colorScheme.error
-//                        )
-
                     }
+
+                    // Mensaje de "agregado al carrito"
                     if (showMessage) {
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "✅ Agregado al carrito",
+                            text = "Agregado al carrito",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSecondary,
                             modifier = Modifier
@@ -505,6 +464,7 @@ fun ProductoCard(
                     }
                 }
 
+                // Botón para agregar al carrito
                 IconButton(
                     onClick = {
                         onAddToCart(producto.id)
@@ -521,7 +481,33 @@ fun ProductoCard(
                     )
                 }
             }
+        }
+    }
+}
 
+// Componente de loading
+@Composable
+fun LoadingIndicator() {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(48.dp),
+                strokeWidth = 4.dp,
+                color = MaterialTheme.colorScheme.primary
+            )
+            Text(
+                text = "Cargando productos...",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onBackground
+            )
         }
     }
 }

@@ -5,5 +5,4 @@ data class UserInfo(
     val email: String = "",
     val telefono: String = "",
     val direccion: String = ""
-
 )

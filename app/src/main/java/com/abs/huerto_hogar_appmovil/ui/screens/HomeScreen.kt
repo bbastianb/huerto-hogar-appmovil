@@ -4,6 +4,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -17,7 +19,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.abs.huerto_hogar_appmovil.R
+import com.abs.huerto_hogar_appmovil.ui.viewmodel.HomeViewModel
 import kotlin.collections.forEach
 
 @Composable
@@ -25,7 +29,7 @@ fun HomeScreen(
     onIrCatalogo: () -> Unit,
     onIrNosotros: () -> Unit,
     onIrContacto: () -> Unit,
-    onIrAdmin: () -> Unit
+    onIrAdmin: () -> Unit,
 ) {
     // imágenes del carrusel (usa las que están en tu res/drawable)
     val imagenesCarrusel = listOf(
@@ -44,7 +48,7 @@ fun HomeScreen(
         ProductoUi("Plátanos", "800", R.drawable.platanos),
         ProductoUi("Espinaca", "700", R.drawable.espinaca)
     )
-
+    val scrollState = rememberScrollState()
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -117,19 +121,18 @@ fun HomeScreen(
                 Text("Admin")
             }
         }
-
-        Spacer(modifier = Modifier.height(10.dp))
-
         Text(
             text = "Productos Recomendados",
             style = MaterialTheme.typography.bodyMedium
         )
 
-        // 3) Cards de productos abajo de los botones
         Column(
-            verticalArrangement = Arrangement.spacedBy(10.dp),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .weight(1f)
+                .verticalScroll(scrollState)
         ) {
+            Spacer(modifier = Modifier.height(10.dp))
+
             productos.forEach { p ->
                 ProductoCard(
                     nombre = p.nombre,
@@ -137,6 +140,7 @@ fun HomeScreen(
                     imagenRes = p.imagenRes,
                     onVer = onIrCatalogo
                 )
+                Spacer(modifier = Modifier.height(10.dp))
             }
         }
     }

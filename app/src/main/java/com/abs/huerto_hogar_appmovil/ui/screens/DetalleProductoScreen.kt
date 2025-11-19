@@ -1,4 +1,3 @@
-// DetalleProductoScreen.kt
 package com.abs.huerto_hogar_appmovil.ui.screens
 
 import androidx.compose.foundation.Image
@@ -49,6 +48,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.DetalleProductoViewModel
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,7 +63,14 @@ fun DetalleProductoScreen(
     LaunchedEffect(productoId) {
         viewModel.cargarProducto(productoId)
     }
+    var showMessage by remember { mutableStateOf(false) }
 
+    LaunchedEffect(showMessage) {
+        if (showMessage) {
+            delay(2000)
+            showMessage = false
+        }
+    }
     val producto by viewModel.producto.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val mensaje by viewModel.mensaje.collectAsState()
@@ -138,11 +145,29 @@ fun DetalleProductoScreen(
                         }
 
                         Spacer(modifier = Modifier.height(12.dp))
+                        if (showMessage) {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = "Agregado al carrito",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSecondary,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(
+                                        MaterialTheme.colorScheme.primaryContainer,
+                                        RoundedCornerShape(8.dp)
+                                    )
+                                    .padding(vertical = 4.dp, horizontal = 8.dp),
+                                textAlign = TextAlign.Center,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
 
                         // Botón agregar al carrito
                         Button(
                             onClick = {
                                 onAddToCart(productoId, cantidad)
+                                showMessage = true
                             },
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(12.dp),
@@ -262,9 +287,9 @@ fun DetalleProductoScreen(
                         // Stock
                         Text(
                             text = if (producto!!.stock > 0) {
-                                "✅ En stock: ${producto!!.stock} disponibles"
+                                "En stock: ${producto!!.stock} disponibles"
                             } else {
-                                "❌ Sin stock"
+                                " Sin stock"
                             },
                             style = MaterialTheme.typography.bodyMedium,
                             color = if (producto!!.stock > 0) MaterialTheme.colorScheme.onSurface
@@ -305,7 +330,6 @@ fun DetalleProductoScreen(
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
 
-                        // Espacio para el bottom bar
                         Spacer(modifier = Modifier.height(100.dp))
                     }
                 }

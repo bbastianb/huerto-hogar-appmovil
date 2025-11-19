@@ -3,7 +3,11 @@ package com.abs.huerto_hogar_appmovil.data.repository
 import com.abs.huerto_hogar_appmovil.R
 import com.abs.huerto_hogar_appmovil.data.model.Producto
 import com.abs.huerto_hogar_appmovil.data.local.dao.ProductoDao
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 class ProductoRepository(private val productoDao: ProductoDao) {
     fun obtenerTodos(): Flow<List<Producto>> = productoDao.obtenerTodos()
@@ -20,12 +24,11 @@ class ProductoRepository(private val productoDao: ProductoDao) {
     suspend fun actualizarStock(productoId: String, cantidad: Int) {
         productoDao.actualizarStock(productoId, cantidad)
     }
-
     suspend fun cargarProductosIniciales() {
-        if (productoDao.contarProductos() == 0) {
-            productoDao.agregarProducto(productosIniciales)
-        }
-
+            delay(1000)
+            if (productoDao.contarProductos() == 0) {
+                productoDao.agregarProducto(productosIniciales)
+            }
     }
     private val productosIniciales = listOf(
         Producto(

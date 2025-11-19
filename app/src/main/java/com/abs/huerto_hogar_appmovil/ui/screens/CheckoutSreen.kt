@@ -83,9 +83,7 @@ fun CheckoutScreen(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
-    // ====== BLOQUE UBICACIÓN (al estilo del ejemplo de tu profe) ======
 
-    // Cliente de ubicación
     val fusedLocationClient = remember {
         LocationServices.getFusedLocationProviderClient(context)
     }
@@ -139,7 +137,7 @@ fun CheckoutScreen(
         }
     }
 
-    // Launcher para pedir permisos MÚLTIPLES (igual que en el ejemplo del profe)
+    // Launcher para pedir permisos MÚLTIPLES
     val locationPermissionLaunch = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
@@ -169,12 +167,11 @@ fun CheckoutScreen(
         ) == PackageManager.PERMISSION_GRANTED
 
         if (hasFine || hasCoarse) {
-            // Ya tiene permiso → directamente recuperamos la ubicación
             scope.launch {
                 recuperarCurrentLocation()
             }
         } else {
-            // Pedimos permisos (igual que en el botón del ejemplo)
+            // Pedimos permisos
             locationPermissionLaunch.launch(
                 arrayOf(
                     Manifest.permission.ACCESS_FINE_LOCATION,
@@ -184,7 +181,6 @@ fun CheckoutScreen(
         }
     }
 
-    // ====== FIN BLOQUE UBICACIÓN ======
     // Navegar cuando la orden esté creada
     LaunchedEffect(ordenCreada) {
         if (ordenCreada) {
@@ -361,7 +357,6 @@ fun SeccionInformacionPersonal(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // ✅ CORREGIDO - Sintaxis correcta para Material 3
             OutlinedTextField(
                 value = checkoutInfo.nombre,
                 onValueChange = { nuevoNombre ->
@@ -377,7 +372,6 @@ fun SeccionInformacionPersonal(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // ✅ CORREGIDO
             OutlinedTextField(
                 value = checkoutInfo.email,
                 onValueChange = { nuevoEmail ->
@@ -394,7 +388,6 @@ fun SeccionInformacionPersonal(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // ✅ CORREGIDO
             OutlinedTextField(
                 value = checkoutInfo.telefono,
                 onValueChange = { nuevoTelefono ->
@@ -411,7 +404,6 @@ fun SeccionInformacionPersonal(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // ✅ CORREGIDO
             OutlinedTextField(
                 value = checkoutInfo.direccion,
                 onValueChange = { nuevaDireccion ->
@@ -423,13 +415,12 @@ fun SeccionInformacionPersonal(
                 },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = false,
-                maxLines = 3 // ✅ En lugar de minLines
+                maxLines = 3
             )
 
             Spacer(modifier = Modifier.height(12.dp))
 
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                // ✅ CORREGIDO
                 OutlinedTextField(
                     value = checkoutInfo.comuna,
                     onValueChange = { nuevaComuna ->
@@ -440,7 +431,6 @@ fun SeccionInformacionPersonal(
                     singleLine = true
                 )
 
-                // ✅ CORREGIDO
                 OutlinedTextField(
                     value = checkoutInfo.region,
                     onValueChange = { nuevaRegion ->

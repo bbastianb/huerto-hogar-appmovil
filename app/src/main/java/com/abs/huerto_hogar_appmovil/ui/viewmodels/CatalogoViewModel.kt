@@ -23,7 +23,7 @@ class CatalogoViewModel(private val repository: ProductoRepository,private val c
 
     fun agregarAlCarrito(productoId: String) {
         viewModelScope.launch {
-            println("🛒 Agregando producto $productoId al carrito")
+            println("Agregando producto $productoId al carrito")
             val exito = carritoRepository.agregarAlCarrito(productoId, 1)
             if (exito) {
                 println(" Producto agregado al carrito")
@@ -45,41 +45,61 @@ class CatalogoViewModel(private val repository: ProductoRepository,private val c
 
     private fun cargarProductosIniciales() {
         viewModelScope.launch {
-            repository.cargarProductosIniciales()
+            _isLoading.value = true
+            try {
+                repository.cargarProductosIniciales()
+            } catch (e: Exception) {
+                println("Error al cargar productos iniciales")
+            } finally {
+                _isLoading.value = false
+            }
         }
     }
 
+
     private fun observarProductos() {
         viewModelScope.launch {
-            repository.obtenerTodos().collect { listaProductos ->
-                _productos.value = listaProductos
-                _isLoading.value = false
+                        try {
+                repository.obtenerTodos().collect { listaProductos ->
+                    _productos.value = listaProductos
+                }
+            } catch (e: Exception) {
+                println("Error al cargar productos")
             }
         }
     }
 
     private fun cargarProductosPorCategoria(categoria: String) {
         viewModelScope.launch {
-            if (categoria == "Todas") {
-                repository.obtenerTodos().collect {
-                    _productos.value = it
+            try {
+                if (categoria == "Todas") {
+                    repository.obtenerTodos().collect {
+                        _productos.value = it
+                    }
+                } else {
+                    repository.obtenerPorCategoria(categoria).collect {
+                        _productos.value = it
+                    }
                 }
-            } else {
-                repository.obtenerPorCategoria(categoria).collect {
-                    _productos.value = it
-                }
+            } catch (e: Exception) {
+                println("Error al cargar productos por categoría")
             }
         }
     }
 
     fun onBuscarChange(query: String) {
         viewModelScope.launch {
-            if (query.length >= 2) {
-                repository.buscarPorNombre(query).collect {
-                    _productos.value = it
+            try {
+                if (query.length >= 2) {
+                    repository.buscarPorNombre(query).collect {
+                        _productos.value = it
+                    }
+                } else if (query.isEmpty()) {
+                    cargarProductosPorCategoria(_categoria.value)
+                } else {
                 }
-            } else if (query.isEmpty()) {
-                cargarProductosPorCategoria(_categoria.value)
+            } catch (e: Exception) {
+                println("Error al buscar productos")
             }
         }
     }

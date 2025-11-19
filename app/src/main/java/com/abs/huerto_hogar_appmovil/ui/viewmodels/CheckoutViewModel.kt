@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.abs.huerto_hogar_appmovil.data.model.Pedido
 import com.abs.huerto_hogar_appmovil.data.model.PedidoItem
+import com.abs.huerto_hogar_appmovil.data.model.Usuario
 import com.abs.huerto_hogar_appmovil.data.repository.PedidoRepository
 import com.abs.huerto_hogar_appmovil.data.repository.CarritoRepository
 import com.abs.huerto_hogar_appmovil.data.repository.ProductoRepository
