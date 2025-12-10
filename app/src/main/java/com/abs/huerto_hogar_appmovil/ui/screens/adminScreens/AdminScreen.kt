@@ -1,4 +1,4 @@
-package com.abs.huerto_hogar_appmovil.ui.screens
+package com.abs.huerto_hogar_appmovil.ui.screens.adminScreens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn

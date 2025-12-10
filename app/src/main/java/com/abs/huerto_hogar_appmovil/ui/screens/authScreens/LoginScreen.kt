@@ -1,4 +1,4 @@
-package com.abs.huerto_hogar_appmovil.ui.screens
+package com.abs.huerto_hogar_appmovil.ui.screens.authScreens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -34,11 +34,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.abs.huerto_hogar_appmovil.R
-import com.abs.huerto_hogar_appmovil.ui.viewmodels.LoginViewModel
+import com.abs.huerto_hogar_appmovil.ui.viewmodels.authVM.LoginViewModel
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.runtime.LaunchedEffect
 
 @Composable
 fun LoginScreen(
@@ -47,7 +47,7 @@ fun LoginScreen(
     onRegistroClick: () -> Unit = {},
     viewModel: LoginViewModel,
 ) {
-    val correo by viewModel.correo.collectAsStateWithLifecycle()
+    val email by viewModel.email.collectAsStateWithLifecycle()
     val contrasenna by viewModel.contrasenna.collectAsStateWithLifecycle()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val errorMessage by viewModel.errorMessage.collectAsStateWithLifecycle()
@@ -60,20 +60,19 @@ fun LoginScreen(
         color = MaterialTheme.colorScheme.background
     ) {
 
-        if (loginExitosoUsuario) {
-            LaunchedEffect(Unit) {
+        LaunchedEffect(loginExitosoUsuario) {
+            if (loginExitosoUsuario) {
                 onLoginExitosoUsuario()
                 viewModel.resetLoginSuccess()
             }
         }
 
-        if (loginExitosoAdmin) {
-            LaunchedEffect(Unit) {
+        LaunchedEffect(loginExitosoAdmin) {
+            if (loginExitosoAdmin) {
                 onLoginExitosoAdmin()
                 viewModel.resetLoginSuccess()
             }
         }
-
 
         if (isLoading) {
             Box(
@@ -98,7 +97,6 @@ fun LoginScreen(
             }
             return@Surface
         }
- 
 
         Column(
             modifier = Modifier
@@ -137,10 +135,9 @@ fun LoginScreen(
             )
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Textfiedl de Correo
             OutlinedTextField(
-                value = correo,
-                onValueChange = viewModel::onCorreoChange,
+                value = email,
+                onValueChange = viewModel::onEmailChange,
                 label = { Text("Correo Electrónico") },
                 modifier = Modifier.fillMaxWidth(),
                 colors = OutlinedTextFieldDefaults.colors(
@@ -164,7 +161,7 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // Textfiedl Contraseña
+            // TextField Contraseña
             OutlinedTextField(
                 value = contrasenna,
                 onValueChange = viewModel::onContrasennaChange,
@@ -184,7 +181,8 @@ fun LoginScreen(
                 leadingIcon = {
                     Icon(Icons.Default.Lock, contentDescription = "Icono de contraseña")
                 },
-                visualTransformation = PasswordVisualTransformation(),                singleLine = true,
+                visualTransformation = PasswordVisualTransformation(),
+                singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 shape = RoundedCornerShape(12.dp)
             )
@@ -202,7 +200,7 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Btn de Ingresar
+            // Botón de Ingresar
             Button(
                 onClick = { viewModel.login() },
                 colors = ButtonDefaults.buttonColors(

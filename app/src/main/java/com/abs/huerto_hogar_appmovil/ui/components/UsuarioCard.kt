@@ -82,7 +82,7 @@ fun UsuarioCard(
                 )
                 Spacer(modifier = Modifier.size(8.dp))
                 Text(
-                    text = usuario.correo,
+                    text = usuario.email,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -91,7 +91,7 @@ fun UsuarioCard(
             Spacer(modifier = Modifier.height(8.dp))
 
             Column {
-                InfoRow("Teléfono:", usuario.fono?.toString() ?: "No especificado")
+                InfoRow("Teléfono:", usuario.telefono?.toString() ?: "No especificado")
                 InfoRow("Dirección:", usuario.direccion ?: "No especificada")
                 InfoRow("Comuna:", usuario.comuna ?: "No especificada")
                 InfoRow("Región:", usuario.region ?: "No especificada")

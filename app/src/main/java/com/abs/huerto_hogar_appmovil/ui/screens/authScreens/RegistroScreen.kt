@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import com.abs.huerto_hogar_appmovil.ui.viewmodels.RegistroViewModel
+import com.abs.huerto_hogar_appmovil.ui.viewmodels.authVM.RegistroViewModel
 
 @Composable
 fun RegistroScreen(

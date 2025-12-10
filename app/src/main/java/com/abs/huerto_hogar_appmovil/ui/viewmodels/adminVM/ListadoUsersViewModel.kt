@@ -1,4 +1,4 @@
-package com.abs.huerto_hogar_appmovil.ui.viewmodels
+package com.abs.huerto_hogar_appmovil.ui.viewmodels.adminVM
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,7 +9,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class ListadoUsersViewModel(private val repository: UsuarioRepository) : ViewModel() {
+class ListadoUsersViewModel(
+    private val repository: UsuarioRepository
+) : ViewModel() {
 
     private val _mostrarDialogo = MutableStateFlow(false)
     val mostrarDialogo: StateFlow<Boolean> = _mostrarDialogo.asStateFlow()
@@ -34,14 +36,18 @@ class ListadoUsersViewModel(private val repository: UsuarioRepository) : ViewMod
 
     private var usuariosCompletos: List<Usuario> = emptyList()
 
+    init {
+        cargarUsuarios()
+    }
+
     fun cargarUsuarios() {
         _isLoading.value = true
         _errorMessage.value = null
 
         viewModelScope.launch {
             try {
-                val listaUsuarios = repository.obtenerTodosLosUsuarios()
-                usuariosCompletos  = listaUsuarios
+                val listaUsuarios = repository.obtenerUsuariosAdmin()
+                usuariosCompletos = listaUsuarios
                 aplicarFiltrosYOrdenamiento()
             } catch (e: Exception) {
                 _errorMessage.value = "Error al cargar usuarios: ${e.message}"
@@ -49,10 +55,6 @@ class ListadoUsersViewModel(private val repository: UsuarioRepository) : ViewMod
                 _isLoading.value = false
             }
         }
-    }
-
-    init {
-        cargarUsuarios()
     }
 
     fun actualizarTextoBusqueda(texto: String) {
@@ -70,30 +72,33 @@ class ListadoUsersViewModel(private val repository: UsuarioRepository) : ViewMod
         _ordenarPor.value = "Nombre"
         aplicarFiltrosYOrdenamiento()
     }
+
     private fun aplicarFiltrosYOrdenamiento() {
         var usuariosFiltrados = usuariosCompletos
 
+        // FILTRO POR TEXTO
         if (_textoBusqueda.value.isNotBlank()) {
             val textoBusquedaLower = _textoBusqueda.value.lowercase()
 
             usuariosFiltrados = usuariosFiltrados.filter { usuario ->
                 usuario.nombre.lowercase().contains(textoBusquedaLower) ||
                         usuario.apellido.lowercase().contains(textoBusquedaLower) ||
-                        usuario.correo.lowercase().contains(textoBusquedaLower) ||
+                        usuario.email.lowercase().contains(textoBusquedaLower) ||
                         usuario.region.lowercase().contains(textoBusquedaLower) ||
                         usuario.comuna.lowercase().contains(textoBusquedaLower) ||
                         usuario.direccion.lowercase().contains(textoBusquedaLower) ||
                         "${usuario.nombre} ${usuario.apellido}".lowercase().contains(textoBusquedaLower)
             }
         }
+
+        // ORDENAMIENTO
         usuariosFiltrados = when (_ordenarPor.value) {
             "Nombre" -> usuariosFiltrados.sortedBy { it.nombre }
-            "Email" -> usuariosFiltrados.sortedBy { it.correo }
+            "Email" -> usuariosFiltrados.sortedBy { it.email }
             "Región" -> usuariosFiltrados.sortedBy { it.region }
             "Comuna" -> usuariosFiltrados.sortedBy { it.comuna }
             else -> usuariosFiltrados
         }
-
 
         _usuarios.value = usuariosFiltrados
     }
@@ -111,15 +116,15 @@ class ListadoUsersViewModel(private val repository: UsuarioRepository) : ViewMod
     fun confirmarEliminacion() {
         val usuario = _usuarioParaEliminar.value
         if (usuario != null) {
-            eliminarUsuario(usuario.correo)
+            eliminarUsuario(usuario.id)
         }
         cerrarDialogo()
     }
 
-    fun eliminarUsuario(correo: String) {
+    fun eliminarUsuario(id: Long) {
         viewModelScope.launch {
             try {
-                val resultado = repository.eliminarUsuario(correo)
+                val resultado = repository.eliminarUsuarioAdmin(id)
                 if (resultado) {
                     cargarUsuarios()
                 } else {
@@ -134,6 +139,4 @@ class ListadoUsersViewModel(private val repository: UsuarioRepository) : ViewMod
     fun clearError() {
         _errorMessage.value = null
     }
-
-
 }

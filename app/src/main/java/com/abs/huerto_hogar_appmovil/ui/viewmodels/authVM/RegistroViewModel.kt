@@ -1,4 +1,4 @@
-package com.abs.huerto_hogar_appmovil.ui.viewmodels
+package com.abs.huerto_hogar_appmovil.ui.viewmodels.authVM
 
 import android.net.Uri
 import androidx.lifecycle.ViewModel
@@ -10,12 +10,13 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class RegistroViewModel(private val usuarioRepository: UsuarioRepository) : ViewModel() {
-
-    /* Definimos los val de los campos */
+class RegistroViewModel(
+    private val usuarioRepository: UsuarioRepository
+) : ViewModel() {
 
     private val _fotoUri = MutableStateFlow<Uri?>(null)
     val fotoUri: StateFlow<Uri?> = _fotoUri.asStateFlow()
+
     private val _nombre = MutableStateFlow("")
     val nombre: StateFlow<String> = _nombre.asStateFlow()
 
@@ -43,8 +44,6 @@ class RegistroViewModel(private val usuarioRepository: UsuarioRepository) : View
     private val _region = MutableStateFlow("")
     val region: StateFlow<String> = _region.asStateFlow()
 
-
-
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
@@ -54,8 +53,6 @@ class RegistroViewModel(private val usuarioRepository: UsuarioRepository) : View
     private val _isSuccess = MutableStateFlow(false)
     val isSuccess: StateFlow<Boolean> = _isSuccess.asStateFlow()
 
-
-    /* Funciones de cambio "Cambios de los textfield" */
 
     fun onFotoCapturada(uri: Uri) {
         _fotoUri.value = uri
@@ -106,8 +103,6 @@ class RegistroViewModel(private val usuarioRepository: UsuarioRepository) : View
         _errorMessage.value = null
     }
 
-
-
     /* Mi funcion para las ext de los correos */
     private fun isValidCorreo(correo: String): Boolean {
         val correoLowerCase = correo.trim().lowercase()
@@ -130,11 +125,12 @@ class RegistroViewModel(private val usuarioRepository: UsuarioRepository) : View
         _region.value = ""
         _fotoUri.value = null
         _errorMessage.value = null
+        _isSuccess.value = false
     }
 
-    fun registrar(){
+    fun registrar() {
 
-        /* Validaciones, si pasa sale del if limpio */
+        /* Validaciones */
 
         if (_nombre.value.isBlank()) {
             _errorMessage.value = "El nombre es obligatorio"
@@ -166,7 +162,6 @@ class RegistroViewModel(private val usuarioRepository: UsuarioRepository) : View
             return
         }
 
-        /* Si da distinto de true carga error */
         if (!isValidCorreo(_correo.value)) {
             _errorMessage.value = "Solo se permiten correos @duoc.cl, @profesor.duoc.cl y @gmail.com"
             return
@@ -212,31 +207,39 @@ class RegistroViewModel(private val usuarioRepository: UsuarioRepository) : View
             return
         }
 
+        // Si pasó todas las validaciones, llamamos al backend
         viewModelScope.launch {
+            _isLoading.value = true
+            _errorMessage.value = null
+
             try {
                 val usuario = Usuario(
+                    // id = 0L se usa por defecto
                     nombre = _nombre.value.trim(),
                     apellido = _apellido.value.trim(),
-                    correo = _correo.value.trim().lowercase(),
+                    email = _correo.value.trim().lowercase(),   // ← ahora email
                     contrasenna = _contrasenna.value,
-                    fono = _fono.value.toIntOrNull() ?: 0,
+                    telefono = _fono.value.trim(),              // ← ahora String
                     direccion = _direccion.value.trim(),
                     comuna = _comuna.value.trim(),
                     region = _region.value.trim(),
                     rol = "usuario"
                 )
-                val correcto = usuarioRepository.registrarUsuario(usuario)
+
+                val correcto = usuarioRepository.registrar(usuario)  // ← nombre correcto del método
+
                 if (correcto) {
                     _isSuccess.value = true
                     limpiarFormulario()
-                }else{
-                    _errorMessage.value = "El correo ya está registrado"
+                } else {
+                    _errorMessage.value = "El correo ya está registrado o hubo un error en el servidor"
                 }
 
-            } catch (e: Exception){
+            } catch (e: Exception) {
                 _errorMessage.value = "Error al registrar: ${e.message}"
+            } finally {
+                _isLoading.value = false
             }
         }
-
     }
 }

@@ -14,3 +14,10 @@
 .cxx
 local.properties
 .kotlin/
+
+gradle/
+gradle/caches/
+gradle/daemon/
+gradle/native/
+gradle/wrapper/dists/
+gradle/android/
