@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import com.abs.huerto_hogar_appmovil.ui.components.CampoRegionDropdown
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.authVM.RegistroViewModel
 
 @Composable
@@ -34,10 +35,11 @@ fun RegistroScreen(
     val isSuccess by viewModel.isSuccess.collectAsState()
     val isCargando by viewModel.isLoading.collectAsState()
 
-    if (isSuccess) {
-        LaunchedEffect(Unit) {
+    LaunchedEffect(isSuccess) {
+        if (isSuccess) {
             onRegistroExitoso()
             viewModel.limpiarFormulario()
+            viewModel.resetSuccess()
         }
     }
 
@@ -70,9 +72,6 @@ fun RegistroScreen(
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onBackground
             )
-
-
-
 
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -144,11 +143,9 @@ fun RegistroScreen(
                         leading = Icons.Filled.LocationOn
                     )
 
-                    HuertoTextField(
-                        value = region,
-                        onValue = viewModel::onRegionChange,
-                        label = "Región",
-                        leading = Icons.Filled.Map
+                    CampoRegionDropdown(
+                        regionCodigoSeleccionado = region.ifBlank { null },
+                        onRegionCodigoChange = viewModel::onRegionChange
                     )
 
                     errorMessage?.let { error ->
@@ -175,7 +172,6 @@ fun RegistroScreen(
                     ) {
                         Text(if (isCargando) "Creando..." else "Crear cuenta")
                     }
-
 
                     TextButton(
                         onClick = onIrALogin,

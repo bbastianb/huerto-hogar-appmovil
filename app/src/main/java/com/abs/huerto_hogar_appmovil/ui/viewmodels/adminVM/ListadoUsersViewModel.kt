@@ -113,13 +113,13 @@ class ListadoUsersViewModel(
         _usuarioParaEliminar.value = null
     }
 
-    fun confirmarEliminacion() {
-        val usuario = _usuarioParaEliminar.value
-        if (usuario != null) {
-            eliminarUsuario(usuario.id)
-        }
-        cerrarDialogo()
-    }
+    //fun confirmarEliminacion() {
+    //    val usuario = _usuarioParaEliminar.value
+    //    if (usuario != null) {
+     //       eliminarUsuario(usuario.id)
+       // }
+        //cerrarDialogo()
+   // }
 
     fun eliminarUsuario(id: Long) {
         viewModelScope.launch {

@@ -68,7 +68,7 @@ fun ListadoUsuariosScreen(
             },
             confirmButton = {
                 TextButton(
-                    onClick = { viewModel.confirmarEliminacion() }
+                    onClick = { viewModel }
                 ) {
                     Text(
                         "ELIMINAR",

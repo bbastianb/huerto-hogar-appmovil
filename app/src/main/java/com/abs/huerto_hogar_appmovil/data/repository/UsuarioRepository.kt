@@ -17,6 +17,9 @@ class UsuarioRepository {
 
         var emailActual: String? = null
             private set
+
+        private var ultimoErrorRegistro: String? = null
+
     }
 
     suspend fun login(email: String, contrasenna: String): Usuario? {
@@ -45,11 +48,24 @@ class UsuarioRepository {
     suspend fun registrar(usuario: Usuario): Boolean {
         return try {
             val response = api.registrar(usuario)
-            response.isSuccessful
+
+            if (response.isSuccessful) {
+                ultimoErrorRegistro = null
+                true
+            } else {
+                val bodyError = response.errorBody()?.string()
+                ultimoErrorRegistro = "Error ${response.code()}: ${bodyError ?: "sin detalle"}"
+                false
+            }
         } catch (e: Exception) {
+            ultimoErrorRegistro = "Excepción: ${e.message}"
             false
         }
     }
+
+    fun obtenerUltimoErrorRegistro(): String? = ultimoErrorRegistro
+
+
 
     suspend fun obtenerUsuariosAdmin(): List<Usuario> {
         val token = tokenActual ?: return emptyList()

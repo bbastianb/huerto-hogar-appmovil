@@ -22,6 +22,8 @@ interface UsuarioApi {
         @Body usuario: Usuario
     ): Response<Usuario>
 
+
+
     @GET("api/usuario")
     suspend fun listarUsuarios(
         @Header("Authorization") authHeader: String
