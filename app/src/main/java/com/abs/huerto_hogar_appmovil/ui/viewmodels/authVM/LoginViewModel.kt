@@ -1,22 +1,22 @@
-package com.abs.huerto_hogar_appmovil.ui.viewmodels
+package com.abs.huerto_hogar_appmovil.ui.viewmodels.authVM
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.abs.huerto_hogar_appmovil.data.model.Usuario
 import com.abs.huerto_hogar_appmovil.data.repository.UsuarioRepository
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.delay
 
-class LoginViewModel(private val usuarioRepository: UsuarioRepository): ViewModel() {
+class LoginViewModel(private val usuarioRepository: UsuarioRepository) : ViewModel() {
 
-    private val _correo = MutableStateFlow("")
-    val correo: StateFlow<String> = _correo.asStateFlow()
+    private val _email = MutableStateFlow("")
+    val email: StateFlow<String> = _email.asStateFlow()
 
     private val _contrasenna = MutableStateFlow("")
-    val contrasenna : StateFlow<String> = _contrasenna.asStateFlow()
+    val contrasenna: StateFlow<String> = _contrasenna.asStateFlow()
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
@@ -36,8 +36,9 @@ class LoginViewModel(private val usuarioRepository: UsuarioRepository): ViewMode
     private val _loginExitosoAdmin = MutableStateFlow(false)
     val loginExitosoAdmin: StateFlow<Boolean> = _loginExitosoAdmin.asStateFlow()
 
-    fun onCorreoChange(nuevoCorreo: String) {
-        _correo.value = nuevoCorreo
+
+    fun onEmailChange(nuevoEmail: String) {
+        _email.value = nuevoEmail
         _errorMessage.value = null
     }
 
@@ -46,19 +47,21 @@ class LoginViewModel(private val usuarioRepository: UsuarioRepository): ViewMode
         _errorMessage.value = null
     }
 
-
     fun limpiarCampos() {
-        _correo.value = ""
+        _email.value = ""
         _contrasenna.value = ""
         _errorMessage.value = null
     }
 
     fun resetLoginSuccess() {
         _loginSuccess.value = false
+        _loginExitosoAdmin.value = false
+        _loginExitosoUsuario.value = false
     }
 
-    fun login (){
-        if (_correo.value.isBlank()){
+    fun login() {
+        // Validaciones básicas
+        if (_email.value.isBlank()) {
             _errorMessage.value = "El correo es obligatorio"
             return
         }
@@ -73,10 +76,10 @@ class LoginViewModel(private val usuarioRepository: UsuarioRepository): ViewMode
 
         viewModelScope.launch {
             try {
-                delay(2000) //Tiene el tiempo de la carga
+                delay(1000)
 
                 val usuario = usuarioRepository.login(
-                    correo = _correo.value.trim().lowercase(),
+                    email = _email.value.trim().lowercase(),
                     contrasenna = _contrasenna.value
                 )
 
@@ -107,6 +110,4 @@ class LoginViewModel(private val usuarioRepository: UsuarioRepository): ViewMode
             }
         }
     }
-
-
 }

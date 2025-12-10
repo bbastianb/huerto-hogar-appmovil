@@ -1,88 +1,81 @@
 package com.abs.huerto_hogar_appmovil.data.repository
 
 import com.abs.huerto_hogar_appmovil.data.model.Usuario
+import com.abs.huerto_hogar_appmovil.data.remote.RetrofitClient
+import com.abs.huerto_hogar_appmovil.data.remote.SolicitudLogin
 
 class UsuarioRepository {
 
-    /* Mi lista con usuarios simulados */
-    private val usuariosRegistrados = mutableListOf<Usuario>()
+    private val api = RetrofitClient.usuarioApi
 
-    init {
-        usuariosRegistrados.add(
-            Usuario(
-                nombre = "Juan",
-                apellido = "Pérez",
-                correo = "juan@duoc.cl",
-                contrasenna = "1234",
-                fono = 912345678,
-                direccion = "Av. Principal 123",
-                comuna = "Santiago",
-                region = "Metropolitana",
-                rol = "usuario"
-            )
+    companion object {
+        var tokenActual: String? = null
+            private set
+
+        var rolActual: String? = null
+            private set
+
+        var emailActual: String? = null
+            private set
+    }
+
+    suspend fun login(email: String, contrasenna: String): Usuario? {
+        val solicitud = SolicitudLogin(
+            email = email,
+            contrasenna = contrasenna
         )
-        usuariosRegistrados.add(
-            Usuario(
-                nombre = "María",
-                apellido = "González",
-                correo = "maria@gmail.com",
-                contrasenna = "1234",
-                fono = 987654321,
-                direccion = "Calle Secundaria 456",
-                comuna = "Providencia",
-                region = "Metropolitana",
-                rol = "admin"
-            )
-        )
-    }
 
-    suspend fun registrarUsuario(usuario: Usuario): Boolean {
-        return try {
-            /* Busca un usuario y setea al usuarioExistente */
-            val usuarioExistente = usuariosRegistrados.find { it.correo == usuario.correo }
-            /* Este valida si el usuario no retorno null existe/no existe */
-            if (usuarioExistente != null) {
-                return false /* Si retorna false el email esta registrado */
-            } else {
-                /* Se agrega a mi lista */
-                usuariosRegistrados.add(usuario)
-                return true
-            }
+        val response = api.login(solicitud)
 
-        } catch (e: Exception){
-            false
+        if (!response.isSuccessful) {
+            val errorBody = response.errorBody()?.string()
+            throw Exception("HTTP ${response.code()} - ${errorBody ?: "sin cuerpo de error"}")
         }
+
+        val body = response.body()
+            ?: throw Exception("Respuesta vacía del servidor")
+
+        tokenActual = body.token
+        rolActual = body.usuario.rol
+        emailActual = body.usuario.email
+
+        return body.usuario
     }
 
-    suspend fun login(correo : String , contrasenna : String ) : Usuario?{
-        return usuariosRegistrados.find {
-            /* Si no cumple retorna null,  si cumple  me retorna el email y la contra */
-            it.correo== correo && it.contrasenna == contrasenna
-        }
-    }
-
-    suspend fun obtenerTodosLosUsuarios(): List<Usuario> {
-        return usuariosRegistrados.toList()
-    }
-
-
-    suspend fun eliminarUsuario(correo: String): Boolean {
+    suspend fun registrar(usuario: Usuario): Boolean {
         return try {
-            val usuarioExistente = usuariosRegistrados.find { it.correo == correo }
-            if (usuarioExistente != null) {
-                usuariosRegistrados.remove(usuarioExistente)
-                true
-            } else {
-                false
-            }
+            val response = api.registrar(usuario)
+            response.isSuccessful
         } catch (e: Exception) {
             false
         }
     }
 
+    suspend fun obtenerUsuariosAdmin(): List<Usuario> {
+        val token = tokenActual ?: return emptyList()
 
-    fun obtenerTotalUsuarios(): Int {
-        return usuariosRegistrados.size
+        return try {
+            val response = api.listarUsuarios("Bearer $token")
+            if (response.isSuccessful) {
+                response.body() ?: emptyList()
+            } else {
+                emptyList()
+            }
+        } catch (e: Exception) {
+            emptyList()
+        }
     }
 
+    suspend fun eliminarUsuarioAdmin(idUsuario: Long): Boolean {
+        val token = tokenActual ?: return false
+
+        return try {
+            val response = api.eliminarUsuario("Bearer $token", idUsuario)
+            response.isSuccessful
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    fun obtenerRolActual(): String? = rolActual
 }

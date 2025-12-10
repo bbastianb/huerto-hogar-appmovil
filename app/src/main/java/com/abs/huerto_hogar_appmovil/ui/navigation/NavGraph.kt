@@ -14,25 +14,25 @@ import androidx.compose.ui.Modifier
 
 import com.abs.huerto_hogar_appmovil.data.repository.ProductoRepository
 import com.abs.huerto_hogar_appmovil.data.repository.UsuarioRepository
-import com.abs.huerto_hogar_appmovil.ui.screens.AdminScreen
+import com.abs.huerto_hogar_appmovil.ui.screens.adminScreens.AdminScreen
 import com.abs.huerto_hogar_appmovil.ui.screens.CarritoScreen
 import com.abs.huerto_hogar_appmovil.ui.screens.CatalogoScreen
 import com.abs.huerto_hogar_appmovil.ui.screens.ContactoScreen
 import com.abs.huerto_hogar_appmovil.ui.screens.DetalleProductoScreen
 import com.abs.huerto_hogar_appmovil.ui.screens.HomeScreen
-import com.abs.huerto_hogar_appmovil.ui.screens.LoginScreen
+import com.abs.huerto_hogar_appmovil.ui.screens.authScreens.LoginScreen
 import com.abs.huerto_hogar_appmovil.ui.screens.NosotrosScreen
 import com.abs.huerto_hogar_appmovil.ui.screens.registro.RegistroScreen
 import com.abs.huerto_hogar_appmovil.ui.screens.CheckoutScreen
-import com.abs.huerto_hogar_appmovil.ui.screens.ListadoUsuariosScreen
+import com.abs.huerto_hogar_appmovil.ui.screens.adminScreens.ListadoUsuariosScreen
 
-import com.abs.huerto_hogar_appmovil.ui.viewmodels.RegistroViewModel
+import com.abs.huerto_hogar_appmovil.ui.viewmodels.authVM.RegistroViewModel
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.CartViewModel
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.CheckoutViewModel
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.DetalleProductoViewModel
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.DetalleProductoViewModelFactory
-import com.abs.huerto_hogar_appmovil.ui.viewmodels.ListadoUsersViewModel
-import com.abs.huerto_hogar_appmovil.ui.viewmodels.LoginViewModel
+import com.abs.huerto_hogar_appmovil.ui.viewmodels.adminVM.ListadoUsersViewModel
+import com.abs.huerto_hogar_appmovil.ui.viewmodels.authVM.LoginViewModel
 
 @Composable
 fun AppNavGraph(

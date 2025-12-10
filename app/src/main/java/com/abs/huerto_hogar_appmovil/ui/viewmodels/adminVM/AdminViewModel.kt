@@ -1,10 +1,9 @@
-package com.abs.huerto_hogar_appmovil.ui.viewmodel
+package com.abs.huerto_hogar_appmovil.ui.viewmodels.adminVM
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.abs.huerto_hogar_appmovil.data.model.Producto
 import com.abs.huerto_hogar_appmovil.data.repository.ProductoRepository
-
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch

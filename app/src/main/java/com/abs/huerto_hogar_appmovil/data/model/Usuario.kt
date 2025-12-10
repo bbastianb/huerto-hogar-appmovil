@@ -4,17 +4,22 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "usuarios" ,  indices = [Index(value = ["correo"], unique = true)])
+@Entity(
+    tableName = "usuarios",
+    indices = [Index(value = ["email"], unique = true)]
+)
 data class Usuario(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0,
-    val nombre : String,
-    val apellido : String,
-    val correo : String,
-    val contrasenna : String,
-    val fono : Int,
-    val direccion : String,
-    val comuna : String,
-    val region : String,
-    val rol : String,
-    //val fotoUri : String? = null //Url de la foto//
+    @PrimaryKey
+    val id: Long = 0L,
+
+    val nombre: String,
+    val apellido: String,
+    val email: String,
+    val contrasenna: String,
+    val telefono: String,
+    val direccion: String,
+    val comuna: String,
+    val region: String,
+    // "admin" / "usuario"
+    val rol: String,
 )

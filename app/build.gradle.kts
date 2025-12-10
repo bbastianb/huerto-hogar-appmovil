@@ -78,8 +78,11 @@ dependencies {
 
     implementation("androidx.core:core-ktx:1.12.0") // Usa la última versión
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0") // Usa la última versión
-    
 
+
+    // Retrofit
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
 
 
 
