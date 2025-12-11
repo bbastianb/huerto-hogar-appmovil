@@ -24,6 +24,8 @@ sealed class Routes(val route: String) {
     data object AdminScreen : Routes("admin_screen")
     data object ListadoUsers : Routes("listadoUsers")
 
+    data object PerfilAdmin: Routes("perfi-admin")
+
     // Detalle con parámetro
     data object DetalleProducto : Routes("detalle_producto/{productoId}") {
         fun build(productoId: String) = "detalle_producto/$productoId"

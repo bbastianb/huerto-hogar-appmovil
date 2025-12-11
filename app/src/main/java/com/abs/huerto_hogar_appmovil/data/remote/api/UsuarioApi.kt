@@ -50,4 +50,5 @@ interface UsuarioApi {
         @Path("id") id: Long,
         @Part foto: MultipartBody.Part
     ): Response<Usuario>
+
 }
