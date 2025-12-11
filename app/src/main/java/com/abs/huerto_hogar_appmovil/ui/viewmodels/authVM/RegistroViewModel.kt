@@ -9,13 +9,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-
+import java.io.File
 class RegistroViewModel(
     private val usuarioRepository: UsuarioRepository
 ) : ViewModel() {
 
     private val _fotoUri = MutableStateFlow<Uri?>(null)
     val fotoUri: StateFlow<Uri?> = _fotoUri.asStateFlow()
+
+    private var fotoFile: File? = null
 
     private val _nombre = MutableStateFlow("")
     val nombre: StateFlow<String> = _nombre.asStateFlow()
@@ -56,6 +58,10 @@ class RegistroViewModel(
 
     fun onFotoCapturada(uri: Uri) {
         _fotoUri.value = uri
+    }
+
+    fun onFotoFileListo(file: File?) {
+        fotoFile = file
     }
 
     fun onNombreChange(nuevoNombre: String) {
@@ -122,12 +128,14 @@ class RegistroViewModel(
         _comuna.value = ""
         _region.value = ""
         _fotoUri.value = null
+        fotoFile = null
         _errorMessage.value = null
     }
 
     fun resetSuccess() {
         _isSuccess.value = false
     }
+
     fun registrar() {
 
         // Validaciones
@@ -224,13 +232,19 @@ class RegistroViewModel(
                     rol = "usuario"
                 )
 
-                val correcto = usuarioRepository.registrar(usuario)
+                val correcto = if (fotoFile != null) {
+                    usuarioRepository.registrarConFotoOpcional(usuario, fotoFile!!)
+                } else {
+                    usuarioRepository.registrar(usuario)
+                }
 
                 if (correcto) {
                     _isSuccess.value = true
                 } else {
                     val errorBack = usuarioRepository.obtenerUltimoErrorRegistro()
-                    _errorMessage.value = errorBack ?: "El correo ya está registrado o hubo un error en el servidor"                }
+                    _errorMessage.value = errorBack
+                        ?: "El correo ya está registrado o hubo un error en el servidor"
+                }
 
             } catch (e: Exception) {
                 _errorMessage.value = "Error al registrar: ${e.message}"
