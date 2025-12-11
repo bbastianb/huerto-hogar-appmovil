@@ -103,7 +103,6 @@ class RegistroViewModel(
         _errorMessage.value = null
     }
 
-    /* Mi funcion para las ext de los correos */
     private fun isValidCorreo(correo: String): Boolean {
         val correoLowerCase = correo.trim().lowercase()
 
@@ -112,7 +111,6 @@ class RegistroViewModel(
                 correoLowerCase.endsWith("@gmail.com")
     }
 
-    /* Mi funcion para limpiar los campos */
     fun limpiarFormulario() {
         _nombre.value = ""
         _apellido.value = ""
@@ -125,12 +123,14 @@ class RegistroViewModel(
         _region.value = ""
         _fotoUri.value = null
         _errorMessage.value = null
-        _isSuccess.value = false
     }
 
+    fun resetSuccess() {
+        _isSuccess.value = false
+    }
     fun registrar() {
 
-        /* Validaciones */
+        // Validaciones
 
         if (_nombre.value.isBlank()) {
             _errorMessage.value = "El nombre es obligatorio"
@@ -172,8 +172,8 @@ class RegistroViewModel(
             return
         }
 
-        if (_contrasenna.value.length < 4 || _contrasenna.value.length > 10) {
-            _errorMessage.value = "La contraseña debe tener entre 4 y 10 caracteres"
+        if (_contrasenna.value.length < 8 ) {
+            _errorMessage.value = "La contraseña debe tener al menos 8 caracteres"
             return
         }
 
@@ -207,33 +207,30 @@ class RegistroViewModel(
             return
         }
 
-        // Si pasó todas las validaciones, llamamos al backend
         viewModelScope.launch {
             _isLoading.value = true
             _errorMessage.value = null
 
             try {
                 val usuario = Usuario(
-                    // id = 0L se usa por defecto
                     nombre = _nombre.value.trim(),
                     apellido = _apellido.value.trim(),
-                    email = _correo.value.trim().lowercase(),   // ← ahora email
+                    email = _correo.value.trim().lowercase(),
                     contrasenna = _contrasenna.value,
-                    telefono = _fono.value.trim(),              // ← ahora String
+                    telefono = _fono.value.trim(),
                     direccion = _direccion.value.trim(),
                     comuna = _comuna.value.trim(),
                     region = _region.value.trim(),
                     rol = "usuario"
                 )
 
-                val correcto = usuarioRepository.registrar(usuario)  // ← nombre correcto del método
+                val correcto = usuarioRepository.registrar(usuario)
 
                 if (correcto) {
                     _isSuccess.value = true
-                    limpiarFormulario()
                 } else {
-                    _errorMessage.value = "El correo ya está registrado o hubo un error en el servidor"
-                }
+                    val errorBack = usuarioRepository.obtenerUltimoErrorRegistro()
+                    _errorMessage.value = errorBack ?: "El correo ya está registrado o hubo un error en el servidor"                }
 
             } catch (e: Exception) {
                 _errorMessage.value = "Error al registrar: ${e.message}"

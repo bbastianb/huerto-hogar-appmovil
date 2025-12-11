@@ -15,6 +15,11 @@ sealed class Routes(val route: String) {
     data object Contacto : Routes("contacto")
 
 
+
+    data object EditarPerfil : Routes("editar_perfil")
+
+
+
     // Admin
     data object AdminScreen : Routes("admin_screen")
     data object ListadoUsers : Routes("listadoUsers")

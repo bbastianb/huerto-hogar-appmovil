@@ -10,8 +10,7 @@ import androidx.room.PrimaryKey
 )
 data class Usuario(
     @PrimaryKey
-    val id: Long = 0L,
-
+    val id: Long? = null,
     val nombre: String,
     val apellido: String,
     val email: String,
