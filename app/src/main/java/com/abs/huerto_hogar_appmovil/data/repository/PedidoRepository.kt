@@ -1,4 +1,3 @@
-// PedidoRepository.kt
 package com.abs.huerto_hogar_appmovil.data.repository
 
 import com.abs.huerto_hogar_appmovil.data.local.dao.PedidoDao
@@ -6,14 +5,12 @@ import com.abs.huerto_hogar_appmovil.data.local.dao.PedidoDao.PedidoConItems
 import com.abs.huerto_hogar_appmovil.data.model.Pedido
 import com.abs.huerto_hogar_appmovil.data.model.PedidoItem
 import com.abs.huerto_hogar_appmovil.data.remote.api.OrdenApi
-import com.abs.huerto_hogar_appmovil.data.remote.api.WeatherApi
-import com.abs.huerto_hogar_appmovil.data.remote.dto.WeatherResponseDto
-
 import com.abs.huerto_hogar_appmovil.data.remote.dto.*
 import kotlinx.coroutines.flow.Flow
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+
 class PedidoRepository(
     private val pedidoDao: PedidoDao,
     private val ordenApi: OrdenApi
@@ -70,25 +67,26 @@ class PedidoRepository(
         pedidoDao.insertarOrderItems(items)
     }
 
-    class WeatherRepository(
-        private val api: WeatherApi
-    ) {
-        suspend fun getWeatherForCity(cityName: String, apiKey: String): WeatherResponseDto? {
-            val response = api.getCurrentWeather(
-                cityName = cityName,
-                apiKey = apiKey
-            )
-            return if (response.isSuccessful) response.body() else null
-        }
-    }
+    // ¡ELIMINA ESTO! Ya tienes otra WeatherRepository en otro archivo
+    // class WeatherRepository(
+    //     private val api: WeatherApi
+    // ) {
+    //     suspend fun getWeatherForCity(cityName: String, apiKey: String): WeatherResponseDto? {
+    //         val response = api.getCurrentWeather(
+    //             cityName = cityName,
+    //             apiKey = apiKey
+    //         )
+    //         return if (response.isSuccessful) response.body() else null
+    //     }
+    // }
 
-//    suspend fun crearPedido(
-//        pedido: Pedido,
-//        items: List<PedidoItem>
-//    ) {
-//        pedidoDao.insertarOrden(pedido)
-//        pedidoDao.insertarOrderItems(items)
-//    }
+    //    suspend fun crearPedido(
+    //        pedido: Pedido,
+    //        items: List<PedidoItem>
+    //    ) {
+    //        pedidoDao.insertarOrden(pedido)
+    //        pedidoDao.insertarOrderItems(items)
+    //    }
 
     fun obtenerTodasLasOrdenes(): Flow<List<Pedido>> =
         pedidoDao.obtenerTodasLasOrdenes()

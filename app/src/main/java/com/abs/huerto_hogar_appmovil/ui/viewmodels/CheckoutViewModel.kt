@@ -22,7 +22,9 @@ data class CheckoutInfo(
     val telefono: String = "",
     val direccion: String = "",
     val comuna: String = "",
-    val region: String = ""
+    val region: String = "",
+    val latitud: Double? = null,
+    val longitud: Double? = null
 )
 
 class CheckoutViewModel(
@@ -36,7 +38,7 @@ class CheckoutViewModel(
     private val _checkoutInfo = MutableStateFlow(CheckoutInfo())
     val checkoutInfo: StateFlow<CheckoutInfo> = _checkoutInfo.asStateFlow()
 
-    // Método de pago
+    // Metodo de pago
     private val _metodoPago = MutableStateFlow("TARJETA_CREDITO")
     val metodoPago: StateFlow<String> = _metodoPago.asStateFlow()
 
@@ -98,11 +100,29 @@ class CheckoutViewModel(
         _checkoutInfo.value = nuevoInfo
         validarCheckout(nuevoInfo)
 
-        // Si hay comuna o región, intenta cargar clima
-        if (nuevoInfo.comuna.isNotBlank() || nuevoInfo.region.isNotBlank()) {
-            cargarClimaParaCheckout()
+        //si tenemos coordenadas, cargamos el clima
+        if (nuevoInfo.latitud != null && nuevoInfo.longitud != null) {
+            getWeatherByCoordinates(nuevoInfo.latitud, nuevoInfo.longitud)
         }
     }
+
+    // Nuevo metodo para actualizar solo coordenadas
+    fun actualizarUbicacion(lat: Double, lon: Double, direccion: String = "", comuna: String = "", region: String = "") {
+        val actual = _checkoutInfo.value
+        val nuevaInfo = actual.copy(
+            latitud = lat,
+            longitud = lon,
+            direccion = direccion.ifBlank { actual.direccion },
+            comuna = comuna.ifBlank { actual.comuna },
+            region = region.ifBlank { actual.region }
+        )
+
+        _checkoutInfo.value = nuevaInfo
+
+        // Cargar clima inmediatamente
+        getWeatherByCoordinates(lat, lon)
+    }
+
 
     fun actualizarMetodoPago(metodo: String) {
         _metodoPago.value = metodo
@@ -126,38 +146,28 @@ class CheckoutViewModel(
     // CLIMA
     // ------------------------
 
-    fun cargarClimaParaCheckout() {
+    private fun getWeatherByCoordinates(lat: Double, lon: Double) {
         viewModelScope.launch {
-            val info = _checkoutInfo.value
-
-            if (info.comuna.isBlank() && info.region.isBlank()) {
-                _weatherError.value = "Completa comuna o región para ver el clima"
-                _weatherInfo.value = null
-                return@launch
-            }
-
-            val ciudadQuery = if (info.comuna.isNotBlank()) {
-                "${info.comuna},CL"
-            } else {
-                "${info.region},CL"
-            }
-
             _isWeatherLoading.value = true
+            _weatherError.value = null
+
             try {
-                val respuesta = weatherRepository.obtenerClimaPorCiudad(ciudadQuery)
-                if (respuesta != null) {
-                    _weatherInfo.value = respuesta
-                    _weatherError.value = null
-                } else {
-                    _weatherError.value = "No se pudo obtener el clima"
-                    _weatherInfo.value = null
-                }
+                val respuesta = weatherRepository.getWeatherByCoordinates(lat, lon)
+                _weatherInfo.value = respuesta
             } catch (e: Exception) {
                 _weatherError.value = "Error al obtener el clima: ${e.message}"
                 _weatherInfo.value = null
             } finally {
                 _isWeatherLoading.value = false
             }
+        }
+    }
+
+    // Metodo para forzar recarga (puedes llamarlo desde la UI si quieres)
+    fun recargarClima() {
+        val info = _checkoutInfo.value
+        if (info.latitud != null && info.longitud != null) {
+            getWeatherByCoordinates(info.latitud, info.longitud)
         }
     }
 

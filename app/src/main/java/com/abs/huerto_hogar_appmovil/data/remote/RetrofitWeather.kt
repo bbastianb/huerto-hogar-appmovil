@@ -5,7 +5,7 @@ import kotlin.getValue
 import com.abs.huerto_hogar_appmovil.data.remote.api.WeatherApi
 
 object RetrofitWeather {
-    private const val BASE_URL = "https://api.openweathermap.org/"
+    private const val BASE_URL = "https://api.openweathermap.org/data/2.5/"
 
     val api: WeatherApi by lazy {
         Retrofit.Builder()

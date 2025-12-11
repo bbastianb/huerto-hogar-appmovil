@@ -87,29 +87,30 @@ fun CheckoutScreen(
                     1
                 )
 
+                var direccion = ""
+                var comuna = ""
+                var region = ""
+
                 if (!addresses.isNullOrEmpty()) {
                     val addr = addresses[0]
 
-                    val direccion = listOfNotNull(
-                        addr.thoroughfare,     // calle
-                        addr.subThoroughfare   // número
-                    ).joinToString(" ").trim()
+                    direccion = listOfNotNull(
+                        addr.thoroughfare,
+                        addr.subThoroughfare
+                    ).joinToString(" ")
 
-                    val comuna = addr.locality ?: ""
-                    val region = addr.adminArea ?: ""
-
-                    val actual = viewModel.checkoutInfo.value
-                    val nuevaInfo = actual.copy(
-                        direccion = if (direccion.isNotBlank()) direccion else actual.direccion,
-                        comuna = if (comuna.isNotBlank()) comuna else actual.comuna,
-                        region = if (region.isNotBlank()) region else actual.region
-                    )
-
-                    viewModel.actualizarCheckoutInfo(nuevaInfo)
-
-                    // Una vez que tenemos comuna/region, podemos disparar el clima de nuevo
-                    viewModel.cargarClimaParaCheckout()
+                    comuna = addr.locality ?: ""
+                    region = addr.adminArea ?: ""
                 }
+
+                // ✅ AHORA usamos el nuevo método con lat/lon
+                viewModel.actualizarUbicacion(
+                    lat = location.latitude,
+                    lon = location.longitude,
+                    direccion = direccion,
+                    comuna = comuna,
+                    region = region
+                )
 
             } else {
                 locationMessage = "No se pudo obtener la ubicación actual"
@@ -118,6 +119,7 @@ fun CheckoutScreen(
             locationMessage = "Error al obtener ubicación: ${e.message}"
         }
     }
+
 
     // Launcher permisos
     val locationPermissionLaunch = rememberLauncherForActivityResult(
@@ -311,7 +313,7 @@ fun CheckoutScreen(
                     weatherInfo = weatherInfo,
                     isLoading = isWeatherLoading,
                     error = weatherError,
-                    onRetry = { viewModel.cargarClimaParaCheckout() }
+                    onRetry = { viewModel.recargarClima() }
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -410,7 +412,7 @@ fun WeatherCard(
 
                 else -> {
                     Text(
-                        text = "Completa tu comuna o usa tu ubicación para ver el clima.",
+                        text = "Usa 'Mi ubicación actual' para ver el clima.",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
