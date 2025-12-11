@@ -8,6 +8,7 @@ import com.abs.huerto_hogar_appmovil.data.model.Usuario
 import com.abs.huerto_hogar_appmovil.data.repository.PedidoRepository
 import com.abs.huerto_hogar_appmovil.data.repository.CarritoRepository
 import com.abs.huerto_hogar_appmovil.data.repository.ProductoRepository
+import com.abs.huerto_hogar_appmovil.data.repository.UsuarioRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -92,70 +93,142 @@ class CheckoutViewModel(
         _puedeProcesarPedido.value = errores.isEmpty()
     }
 
-    fun procesarPedido() {
-        viewModelScope.launch {
-            _isLoading.value = true
-            try {
-                // Validar antes de procesar
-                validarCheckout(_checkoutInfo.value)
-                if (!_puedeProcesarPedido.value) {
-                    _mensaje.value = "Por favor completa: " +
-                            _erroresValidacion.value.joinToString(", ")
-                    return@launch
-                }
-
-                val items = carritoRepository.obtenerCarrito().first()
-
-                if (items.isEmpty()) {
-                    _mensaje.value = "El carrito está vacío"
-                    return@launch
-                }
-
-                val info = _checkoutInfo.value
-
-                val pedido = Pedido(
-                    total = _totalPedido.value,
-                    metodoPago = _metodoPago.value,
-                    direccionEnvio = info.direccion,
-                    comunaEnvio = info.comuna,
-                    regionEnvio = info.region,
-                    telefonoContacto = info.telefono,
-                    correoContacto = info.email
-                )
-
-                val pedidoItems = items.map { carritoItem ->
-                    PedidoItem(
-                        pedidoId = pedido.id,
-                        productoId = carritoItem.producto.id,
-                        nombreProducto = carritoItem.producto.nombre,
-                        precioUnitario = carritoItem.producto.precio,
-                        cantidad = carritoItem.carrito.cantidad,
-                        subtotal = carritoItem.producto.precio * carritoItem.carrito.cantidad
-                    )
-                }
-
-                pedidoRepository.crearPedido(pedido, pedidoItems)
-
-                items.forEach { item ->
-                    val nuevoStock = item.producto.stock - item.carrito.cantidad
-                    if (nuevoStock >= 0) {
-                        productoRepository.actualizarStock(item.producto.id, nuevoStock)
-                    }
-                }
-
-                carritoRepository.vaciarCarrito()
-
-                _mensaje.value = "Pedido creado exitosamente"
-                _ordenCreada.value = true
-
-            } catch (e: Exception) {
-                _mensaje.value = "Error al crear el pedido: ${e.localizedMessage ?: "desconocido"}"
-                e.printStackTrace() // se ve en Logcat, pero NO bota la app
-            } finally {
-                _isLoading.value = false
+//    fun procesarPedido() {
+//        viewModelScope.launch {
+//            _isLoading.value = true
+//            try {
+//                // Validar antes de procesar
+//                validarCheckout(_checkoutInfo.value)
+//                if (!_puedeProcesarPedido.value) {
+//                    _mensaje.value = "Por favor completa: " +
+//                            _erroresValidacion.value.joinToString(", ")
+//                    return@launch
+//                }
+//
+//                val items = carritoRepository.obtenerCarrito().first()
+//
+//                if (items.isEmpty()) {
+//                    _mensaje.value = "El carrito está vacío"
+//                    return@launch
+//                }
+//
+//                val info = _checkoutInfo.value
+//
+//                val pedido = Pedido(
+//                    total = _totalPedido.value,
+//                    metodoPago = _metodoPago.value,
+//                    direccionEnvio = info.direccion,
+//                    comunaEnvio = info.comuna,
+//                    regionEnvio = info.region,
+//                    telefonoContacto = info.telefono,
+//                    correoContacto = info.email
+//                )
+//
+//                val pedidoItems = items.map { carritoItem ->
+//                    PedidoItem(
+//                        pedidoId = pedido.id,
+//                        productoId = carritoItem.producto.id,
+//                        nombreProducto = carritoItem.producto.nombre,
+//                        precioUnitario = carritoItem.producto.precio,
+//                        cantidad = carritoItem.carrito.cantidad,
+//                        subtotal = carritoItem.producto.precio * carritoItem.carrito.cantidad
+//                    )
+//                }
+//
+//                pedidoRepository.crearPedido(pedido, pedidoItems)
+//
+//                items.forEach { item ->
+//                    val nuevoStock = item.producto.stock - item.carrito.cantidad
+//                    if (nuevoStock >= 0) {
+//                        productoRepository.actualizarStock(item.producto.id, nuevoStock)
+//                    }
+//                }
+//
+//                carritoRepository.vaciarCarrito()
+//
+//                _mensaje.value = "Pedido creado exitosamente"
+//                _ordenCreada.value = true
+//
+//            } catch (e: Exception) {
+//                _mensaje.value = "Error al crear el pedido: ${e.localizedMessage ?: "desconocido"}"
+//                e.printStackTrace() // se ve en Logcat, pero NO bota la app
+//            } finally {
+//                _isLoading.value = false
+//            }
+//        }
+//    }
+fun procesarPedido() {
+    viewModelScope.launch {
+        _isLoading.value = true
+        try {
+            validarCheckout(_checkoutInfo.value)
+            if (!_puedeProcesarPedido.value) {
+                _mensaje.value = "Por favor completa: " +
+                        _erroresValidacion.value.joinToString(", ")
+                return@launch
             }
+
+            val items = carritoRepository.obtenerCarrito().first()
+
+            if (items.isEmpty()) {
+                _mensaje.value = "El carrito está vacío"
+                return@launch
+            }
+
+            val info = _checkoutInfo.value
+
+            val pedido = Pedido(
+                total = _totalPedido.value,
+                metodoPago = _metodoPago.value,
+                direccionEnvio = info.direccion,
+                comunaEnvio = info.comuna,
+                regionEnvio = info.region,
+                telefonoContacto = info.telefono,
+                correoContacto = info.email
+            )
+
+            val pedidoItems = items.map { carritoItem ->
+                PedidoItem(
+                    pedidoId = pedido.id,
+                    productoId = carritoItem.producto.id,
+                    nombreProducto = carritoItem.producto.nombre,
+                    precioUnitario = carritoItem.producto.precio,
+                    cantidad = carritoItem.carrito.cantidad,
+                    subtotal = carritoItem.producto.precio * carritoItem.carrito.cantidad
+                )
+            }
+
+
+            val usuarioId = UsuarioRepository.idActual
+                ?: throw Exception("ID de usuario no disponible")
+
+            pedidoRepository.crearPedidoEnBackendYLocal(
+                pedido = pedido,
+                items = pedidoItems,
+                usuarioId = usuarioId
+            )
+
+            // actualizar stock local como ya hacías
+            items.forEach { item ->
+                val nuevoStock = item.producto.stock - item.carrito.cantidad
+                if (nuevoStock >= 0) {
+                    productoRepository.actualizarStock(item.producto.id, nuevoStock)
+                }
+            }
+
+            carritoRepository.vaciarCarrito()
+
+            _mensaje.value = "Pedido creado exitosamente"
+            _ordenCreada.value = true
+
+        } catch (e: Exception) {
+            _mensaje.value = "Error al crear el pedido: ${e.localizedMessage ?: "desconocido"}"
+            e.printStackTrace()
+        } finally {
+            _isLoading.value = false
         }
     }
+}
 
     fun limpiarMensaje() {
         _mensaje.value = ""

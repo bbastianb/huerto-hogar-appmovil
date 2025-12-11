@@ -47,7 +47,7 @@ fun AppNavGraph(
     productoRepository: ProductoRepository,
     cartViewModel: CartViewModel,
     modifier: Modifier = Modifier,
-    startDestination: String = Routes.Login.route // cambia a Routes.Catalogo.route si ya hay sesión
+    startDestination: String = Routes.Login.route
 ) {
     NavHost(
         navController = navController,
@@ -107,7 +107,6 @@ fun AppNavGraph(
                 onIrCatalogo = { navController.navigate(Routes.Catalogo.route) },
                 onIrNosotros = { navController.navigate(Routes.Nosotros.route) },
                 onIrContacto = { navController.navigate(Routes.Contacto.route) },
-                onIrAdmin = { navController.navigate(Routes.AdminScreen.route) }
             )
         }
         composable(Routes.Nosotros.route) {
@@ -151,7 +150,7 @@ fun AppNavGraph(
                 }
             )
 
-            ListadoUsuariosScreen( // ← Usa el nombre correcto de tu composable
+            ListadoUsuariosScreen(
                 viewModel = listadoUsersViewModel
             )
         }
@@ -200,34 +199,27 @@ fun AppNavGraph(
                 viewModel = checkoutViewModel
             )
         }
-        composable (Routes.EditarPerfil.route){
-            val context = LocalContext.current
-            val usuarioRepository = UsuarioRepository(context)
+        composable(Routes.EditarPerfil.route) {
 
-            val viewModel: EditarPerfilViewModel = viewModel (
-                factory = object : ViewModelProvider.Factory{
+            val editarPerfilViewModel: EditarPerfilViewModel = viewModel(
+                factory = object : ViewModelProvider.Factory {
                     override fun <T : ViewModel> create(modelClass: Class<T>): T {
                         @Suppress("UNCHECKED_CAST")
                         return EditarPerfilViewModel(usuarioRepository) as T
                     }
                 }
             )
+
             EditarPerfilScreen(
-                viewModel = viewModel,
-                onVolverClick = {navController.popBackStack()},
+                viewModel = editarPerfilViewModel,
+                onVolverClick = { navController.popBackStack() },
                 onCerrarSesion = {
                     usuarioRepository.cerrarSesion()
-                    navController.navigate(Routes.Login.route){
-                        popUpTo (Routes.Home.route){inclusive=true  }
+                    navController.navigate(Routes.Login.route) {
+                        popUpTo(Routes.Home.route) { inclusive = true }
                     }
                 }
             )
         }
     }
 }
-
-@Composable
-fun ListadoUsersScreen(usuarioRepository: UsuarioRepository, onBack: () -> Boolean) {
-    TODO("Not yet implemented")
-}
-
