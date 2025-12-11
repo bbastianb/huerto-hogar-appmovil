@@ -11,6 +11,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.rememberCameraPositionState
+import com.google.maps.android.compose.rememberMarkerState
 
 data class Sucursal(
     val nombre: String,
@@ -27,7 +33,9 @@ fun NosotrosScreen(onBack: () -> Unit) {
         Sucursal(
             "Sucursal Santiago",
             "Av. Providencia 1050, Santiago",
-            "+56 9 3456 7890"
+            "+56 9 3456 7890",
+            lat = -33.42628,
+            lng = -70.61859
         ),
         Sucursal(
             "Sucursal Viña del Mar",
@@ -50,6 +58,19 @@ fun NosotrosScreen(onBack: () -> Unit) {
             "+56 9 8888 9999"
         )
     )
+    //usamos la primera sucursal como principal para el mapa
+    val sucursalPrincipal = sucursales.first()
+
+    //Coordenadas en formato latlng para maps
+    val posicionPrincipal =LatLng(sucursalPrincipal.lat,sucursalPrincipal.lng)
+
+    //Estado de la cámara del mapa
+    val cameraPositionState = rememberCameraPositionState {
+        position = CameraPosition.fromLatLngZoom(posicionPrincipal,15f)
+    }
+    //Estado del marcador que se dibuja en el mapa
+    val markerState = rememberMarkerState(position = posicionPrincipal)
+
 
     Scaffold(
         topBar = {
@@ -98,6 +119,31 @@ fun NosotrosScreen(onBack: () -> Unit) {
                         "Encuentra nuestras sucursales en todo Chile",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+            Text(
+                "Ubicación sucursal principal",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+            )
+            Card (
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(260.dp)
+                    .padding(horizontal = 16.dp),
+                    elevation = CardDefaults.cardElevation(4.dp)
+
+            ){
+                GoogleMap (
+                    modifier = Modifier.fillMaxSize(),
+                    cameraPositionState = cameraPositionState
+                ){
+                    Marker(
+                        state = markerState,
+                        title = sucursalPrincipal.nombre,
+                        snippet = sucursalPrincipal.direccion
                     )
                 }
             }
