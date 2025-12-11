@@ -1,4 +1,3 @@
-// ui/components/HuertoBottomBar.kt
 package com.abs.huerto_hogar_appmovil.ui.components
 
 import androidx.compose.material3.*

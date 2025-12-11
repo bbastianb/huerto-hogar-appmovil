@@ -11,7 +11,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 
 import com.abs.huerto_hogar_appmovil.data.repository.ProductoRepository
 import com.abs.huerto_hogar_appmovil.data.repository.UsuarioRepository
@@ -34,7 +33,7 @@ import com.abs.huerto_hogar_appmovil.ui.viewmodels.CheckoutViewModel
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.DetalleProductoViewModel
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.DetalleProductoViewModelFactory
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.adminVM.ListadoUsersViewModel
-import com.abs.huerto_hogar_appmovil.ui.viewmodels.authVM.EditarPerfilViewModel
+import com.abs.huerto_hogar_appmovil.ui.viewmodels.EditarPerfilViewModel
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.authVM.LoginViewModel
 
 @Composable
@@ -221,5 +220,6 @@ fun AppNavGraph(
                 }
             )
         }
+
     }
 }
