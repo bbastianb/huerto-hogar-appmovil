@@ -8,6 +8,7 @@ import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 
 interface UsuarioApi {
@@ -20,6 +21,13 @@ interface UsuarioApi {
     @POST("api/usuario/guardar")
     suspend fun registrar(
         @Body usuario: Usuario
+    ): Response<Usuario>
+
+    @PUT("api/usuario/actualizar/{id}")
+    suspend fun actualizarUsuario(
+        @Header("Authorization") authHeader: String,
+        @Path("id") id: Long,
+        @Body usuarioActualizado: Usuario
     ): Response<Usuario>
 
     @GET("api/usuario")
