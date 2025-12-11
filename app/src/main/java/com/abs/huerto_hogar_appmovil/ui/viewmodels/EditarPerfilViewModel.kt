@@ -1,7 +1,8 @@
-package com.abs.huerto_hogar_appmovil.ui.viewmodels.authVM
+package com.abs.huerto_hogar_appmovil.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.abs.huerto_hogar_appmovil.data.model.Usuario
 import com.abs.huerto_hogar_appmovil.data.repository.UsuarioRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -40,6 +41,10 @@ class EditarPerfilViewModel(
                 it.copy(error = "No hay usuario logueado, vuelva a iniciar sesión.")
             }
         } else {
+            val regionSegura = usuario.region ?: ""
+            val telefonoSeguro = usuario.telefono ?: ""
+            val direccionSegura = usuario.direccion ?: ""
+            val comunaSegura = usuario.comuna ?: ""
             _uiState.update {
                 it.copy(
                     nombre = usuario.nombre,
@@ -99,13 +104,17 @@ class EditarPerfilViewModel(
             0
         else fonoLimpio.toIntOrNull() ?: 0
 
-        val actualizado = usuarioActual.copy(
+        val actualizado = Usuario(
+            id = usuarioActual.id,
             nombre = state.nombre.trim(),
             apellido = state.apellido.trim(),
+            email = usuarioActual.email,
+            contrasenna = usuarioActual.contrasenna,
             telefono = fonoInt.toString(),
             direccion = state.direccion.trim(),
             comuna = state.comuna.trim(),
-            region = state.region.trim()
+            region = state.region.trim(),
+            rol = usuarioActual.rol
         )
 
         viewModelScope.launch {

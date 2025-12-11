@@ -21,13 +21,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.abs.huerto_hogar_appmovil.ui.viewmodels.authVM.EditarPerfilViewModel
+import com.abs.huerto_hogar_appmovil.ui.viewmodels.EditarPerfilViewModel
 
 @Composable
 fun EditarPerfilScreen(
     viewModel: EditarPerfilViewModel,
     onVolverClick: () -> Unit,
-    onCerrarSesion: () -> Unit   // 👈 LO AGREGAMOS AQUÍ
+    onCerrarSesion: () -> Unit
 ) {
     val state by viewModel.uiState.collectAsState()
 
@@ -147,7 +147,6 @@ fun EditarPerfilScreen(
 
         Spacer(Modifier.height(32.dp))
 
-        // 🔻 Botón CERRAR SESIÓN al final de la pantalla
         Button(
             onClick = onCerrarSesion,
             modifier = Modifier.fillMaxWidth()
