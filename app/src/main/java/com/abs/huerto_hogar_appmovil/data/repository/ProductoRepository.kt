@@ -3,32 +3,67 @@ package com.abs.huerto_hogar_appmovil.data.repository
 import com.abs.huerto_hogar_appmovil.R
 import com.abs.huerto_hogar_appmovil.data.model.Producto
 import com.abs.huerto_hogar_appmovil.data.local.dao.ProductoDao
+import com.abs.huerto_hogar_appmovil.data.remote.api.ProductoApi
+import com.abs.huerto_hogar_appmovil.data.remote.dto.toEntity
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-
-class ProductoRepository(private val productoDao: ProductoDao) {
+class ProductoRepository(
+    private val productoDao: ProductoDao,
+    private val productoApi : ProductoApi
+) {
     fun obtenerTodos(): Flow<List<Producto>> = productoDao.obtenerTodos()
 
     fun obtenerPorCategoria(categoria: String): Flow<List<Producto>> =
         productoDao.obtenerPorCategoria(categoria)
-
     fun buscarPorNombre(query: String): Flow<List<Producto>> =
         productoDao.buscarPorNombre(query)
 
-    suspend fun obtenerPorId(productoId: String): Producto? =
-        productoDao.obtenerPorId(productoId)
+    suspend fun obtenerPorId(productoId: String): Producto? {
+        val local = productoDao.obtenerPorId(productoId)
+        if (local != null) return local
+        return try {
+            val response = productoApi.buscarProductoPorId(productoId)
+            if (response.isSuccessful) {
+                response.body()?.let { dto ->
+                    val entity = dto.toEntity()
+                    productoDao.agregarProducto(listOf(entity))
+                    entity
+                }
+            } else {
+                null
+            }
+        }catch (e: Exception){
+            null
+        }
+    }
+    suspend fun sincronizarBackEnd(){
+        val response = productoApi.listarProductos()
+        if (response.isSuccessful){
+            val listaDto = response.body().orEmpty()
+            val entidades=listaDto.map { it.toEntity() }
+            productoDao.borrarTodos()
+            productoDao.agregarProducto(entidades)
+        }else {
+            throw Exception("Error al obtener productos: ${response.code()}")
+        }
+    }
+
 
     suspend fun actualizarStock(productoId: String, cantidad: Int) {
         productoDao.actualizarStock(productoId, cantidad)
     }
     suspend fun cargarProductosIniciales() {
-            delay(1000)
-            if (productoDao.contarProductos() == 0) {
-                productoDao.agregarProducto(productosIniciales)
-            }
+        delay(500)
+        val remotoOk = try{
+            sincronizarBackEnd()
+            true
+        }catch (e: Exception){
+            e.printStackTrace()
+            false
+        }
+        if (!remotoOk&&productoDao.contarProductos()==0){
+            productoDao.agregarProducto(productosIniciales)
+        }
     }
     private val productosIniciales = listOf(
         Producto(

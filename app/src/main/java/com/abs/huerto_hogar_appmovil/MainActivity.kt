@@ -16,6 +16,7 @@ import com.abs.huerto_hogar_appmovil.data.repository.ProductoRepository
 import com.abs.huerto_hogar_appmovil.data.repository.UsuarioRepository
 import com.abs.huerto_hogar_appmovil.ui.navigation.AppRoot
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.abs.huerto_hogar_appmovil.data.remote.RetrofitProducto
 import com.abs.huerto_hogar_appmovil.data.repository.PedidoRepository
 import com.abs.huerto_hogar_appmovil.ui.navigation.AppRoot
 import com.abs.huerto_hogar_appmovil.ui.theme.HuertohogarappmovilTheme
@@ -37,7 +38,7 @@ class MainActivity : ComponentActivity() {
             .fallbackToDestructiveMigration()
             .build()
 
-        val productoRepository = ProductoRepository(database.productoDao())
+        val productoRepository = ProductoRepository(database.productoDao(), RetrofitProducto.apiProducto)
         val carritoRepository  = CarritoRepository(database.carritoDao(), productoRepository)
         val usuarioRepository  = UsuarioRepository()
         val pedidoRepository  = PedidoRepository(database.pedidoDao())

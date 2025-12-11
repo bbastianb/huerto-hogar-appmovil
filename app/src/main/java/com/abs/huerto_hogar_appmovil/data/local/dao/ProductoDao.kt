@@ -13,6 +13,9 @@ import kotlinx.coroutines.flow.Flow
 interface ProductoDao {
     @Insert(onConflict = OnConflictStrategy.Companion.REPLACE)
     suspend fun agregarProducto(productos: List<Producto>)
+
+    @Query("DELETE FROM productos")
+    suspend fun borrarTodos()
     @Update
     suspend fun actualizarProducto(productos: Producto)
     @Delete
@@ -35,4 +38,6 @@ interface ProductoDao {
     //Cuenta los producto iniciales
     @Query("SELECT COUNT(*)FROM productos")
     suspend fun contarProductos():Int
+
+
 }
