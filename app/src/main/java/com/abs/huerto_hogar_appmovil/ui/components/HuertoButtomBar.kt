@@ -26,7 +26,7 @@ fun HuertoBottomBar(
         unselectedIconColor = MaterialTheme.colorScheme.tertiary,
         unselectedTextColor =  MaterialTheme.colorScheme.tertiary,
 
-    )
+        )
 
     NavigationBar {
         // INICIO
