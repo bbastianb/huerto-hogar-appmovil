@@ -1,5 +1,9 @@
 package com.abs.huerto_hogar_appmovil.ui.screens.registro
 
+import android.graphics.Bitmap
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -10,11 +14,15 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.abs.huerto_hogar_appmovil.ui.components.CampoRegionDropdown
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.authVM.RegistroViewModel
+import java.io.File
+import java.io.FileOutputStream
 
 @Composable
 fun RegistroScreen(
@@ -35,11 +43,52 @@ fun RegistroScreen(
     val isSuccess by viewModel.isSuccess.collectAsState()
     val isCargando by viewModel.isLoading.collectAsState()
 
+    val context = LocalContext.current
+    var fotoPreview by remember { mutableStateOf<Bitmap?>(null) }
+    var errorFoto by remember { mutableStateOf<String?>(null) }
+
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicturePreview()
+    ) { bitmap: Bitmap? ->
+        try {
+            if (bitmap != null) {
+                fotoPreview = bitmap
+                errorFoto = null
+
+                val tempFile = File.createTempFile("foto_registro_", ".jpg", context.cacheDir)
+                FileOutputStream(tempFile).use { out ->
+                    if (!bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out)) {
+                        throw Exception("No se pudo comprimir la imagen")
+                    }
+                }
+
+                viewModel.onFotoFileListo(tempFile)
+            } else {
+                errorFoto = "No se pudo obtener la imagen de la cámara"
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            errorFoto = "Error al procesar la foto: ${e.message}"
+        }
+    }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) {
+            cameraLauncher.launch(null)
+        } else {
+            errorFoto = "Permiso de cámara denegado"
+        }
+    }
+
     LaunchedEffect(isSuccess) {
         if (isSuccess) {
             onRegistroExitoso()
             viewModel.limpiarFormulario()
             viewModel.resetSuccess()
+            fotoPreview = null
+            errorFoto = null
         }
     }
 
@@ -85,6 +134,40 @@ fun RegistroScreen(
                     modifier = Modifier.padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
+                    if (fotoPreview != null) {
+                        Image(
+                            bitmap = fotoPreview!!.asImageBitmap(),
+                            contentDescription = "Foto de perfil",
+                            modifier = Modifier
+                                .size(120.dp)
+                                .align(Alignment.CenterHorizontally)
+                        )
+                    }
+
+                    Button(
+                        onClick = {
+                            permissionLauncher.launch(android.Manifest.permission.CAMERA)
+                        },
+                        modifier = Modifier.align(Alignment.CenterHorizontally),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.CameraAlt,
+                            contentDescription = "Tomar foto",
+                            modifier = Modifier.padding(end = 8.dp)
+                        )
+                        Text("Tomar foto")
+                    }
+
+                    errorFoto?.let { msg ->
+                        Text(
+                            text = msg,
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                        )
+                    }
+
                     HuertoTextField(
                         value = nombre,
                         onValue = viewModel::onNombreChange,
