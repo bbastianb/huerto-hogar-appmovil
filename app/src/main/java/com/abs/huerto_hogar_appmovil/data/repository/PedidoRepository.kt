@@ -6,6 +6,9 @@ import com.abs.huerto_hogar_appmovil.data.local.dao.PedidoDao.PedidoConItems
 import com.abs.huerto_hogar_appmovil.data.model.Pedido
 import com.abs.huerto_hogar_appmovil.data.model.PedidoItem
 import com.abs.huerto_hogar_appmovil.data.remote.api.OrdenApi
+import com.abs.huerto_hogar_appmovil.data.remote.api.WeatherApi
+import com.abs.huerto_hogar_appmovil.data.remote.dto.WeatherResponseDto
+
 import com.abs.huerto_hogar_appmovil.data.remote.dto.*
 import kotlinx.coroutines.flow.Flow
 import java.text.SimpleDateFormat
@@ -65,6 +68,18 @@ class PedidoRepository(
         // 5) si todo OK, guardar en Room como hasta ahora
         pedidoDao.insertarOrden(pedido)
         pedidoDao.insertarOrderItems(items)
+    }
+
+    class WeatherRepository(
+        private val api: WeatherApi
+    ) {
+        suspend fun getWeatherForCity(cityName: String, apiKey: String): WeatherResponseDto? {
+            val response = api.getCurrentWeather(
+                cityName = cityName,
+                apiKey = apiKey
+            )
+            return if (response.isSuccessful) response.body() else null
+        }
     }
 
 //    suspend fun crearPedido(
