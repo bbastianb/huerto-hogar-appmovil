@@ -31,7 +31,6 @@ class UsuarioRepository {
             private set
 
         private var ultimoErrorRegistro: String? = null
-
     }
 
     suspend fun login(email: String, contrasenna: String): Usuario? {
@@ -59,6 +58,7 @@ class UsuarioRepository {
         return body.usuario
     }
 
+
     suspend fun registrar(usuario: Usuario): Boolean {
         return try {
             val response = api.registrar(usuario)
@@ -76,7 +76,6 @@ class UsuarioRepository {
             false
         }
     }
-
 
 
     fun obtenerUltimoErrorRegistro(): String? = ultimoErrorRegistro
@@ -148,27 +147,58 @@ class UsuarioRepository {
             emptyList()
         }
     }
-    suspend fun actualizarPerfilUsuario(usuarioActualizado: Usuario): Usuario{
+
+    suspend fun actualizarPerfilUsuario(usuarioActualizado: Usuario): Usuario {
         val token = tokenActual ?: throw Exception("Usuario no autenticado")
-        val id = idActual ?: throw Exception ("ID de usuario no disponible")
+        val id = idActual ?: throw Exception("ID de usuario no disponible")
 
         val response = api.actualizarUsuario(
             authHeader = "Bearer $token",
             id = id,
             usuarioActualizado = usuarioActualizado
         )
+
         if (!response.isSuccessful) {
             val errorBody = response.errorBody()?.string()
             throw Exception("HTTP ${response.code()} - ${errorBody ?: "error al actualizar usuario"}")
         }
-        val body = response.body() ?: throw Exception("Respuesta vacia del servidor")
 
-        emailActual= body.email
+        val body = response.body() ?: throw Exception("Respuesta vacía del servidor")
+
+        emailActual = body.email
         rolActual = body.rol
         idActual = body.id
-        usuarioActual =body
+        usuarioActual = body
+
         return body
     }
+
+    suspend fun actualizarFotoPerfilActual(fotoFile: File): Usuario {
+        val id = idActual ?: throw Exception("ID de usuario no disponible")
+
+        val requestFile = fotoFile
+            .asRequestBody("image/*".toMediaTypeOrNull())
+
+        val multipartBody = MultipartBody.Part.createFormData(
+            name = "foto",
+            filename = fotoFile.name,
+            body = requestFile
+        )
+
+        val response = api.actualizarFotoPerfil(id, multipartBody)
+
+        if (!response.isSuccessful) {
+            val errorBody = response.errorBody()?.string()
+            throw Exception("HTTP ${response.code()} - ${errorBody ?: "error al actualizar foto de perfil"}")
+        }
+
+        val body = response.body() ?: throw Exception("Respuesta vacía del servidor")
+
+        usuarioActual = body
+
+        return body
+    }
+
 
     suspend fun eliminarUsuarioAdmin(idUsuario: Long): Boolean {
         val token = tokenActual ?: return false
@@ -181,17 +211,14 @@ class UsuarioRepository {
         }
     }
 
-    fun cerrarSesion(){
+    fun cerrarSesion() {
         tokenActual = null
-        rolActual =null
+        rolActual = null
         emailActual = null
-        idActual =null
+        idActual = null
         usuarioActual = null
     }
 
     fun obtenerRolActual(): String? = rolActual
     fun obtenerUsuarioActual(): Usuario? = usuarioActual
-
-
-
 }

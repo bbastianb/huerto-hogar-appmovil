@@ -7,6 +7,7 @@ import com.abs.huerto_hogar_appmovil.data.repository.UsuarioRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class ListadoUsersViewModel(
@@ -34,6 +35,7 @@ class ListadoUsersViewModel(
     private val _ordenarPor = MutableStateFlow("Nombre")
     val ordenarPor: StateFlow<String> = _ordenarPor.asStateFlow()
 
+    // Lista completa sin filtros
     private var usuariosCompletos: List<Usuario> = emptyList()
 
     init {
@@ -87,7 +89,8 @@ class ListadoUsersViewModel(
                         usuario.region.lowercase().contains(textoBusquedaLower) ||
                         usuario.comuna.lowercase().contains(textoBusquedaLower) ||
                         usuario.direccion.lowercase().contains(textoBusquedaLower) ||
-                        "${usuario.nombre} ${usuario.apellido}".lowercase().contains(textoBusquedaLower)
+                        "${usuario.nombre} ${usuario.apellido}".lowercase()
+                            .contains(textoBusquedaLower)
             }
         }
 
@@ -113,25 +116,34 @@ class ListadoUsersViewModel(
         _usuarioParaEliminar.value = null
     }
 
-    //fun confirmarEliminacion() {
-    //    val usuario = _usuarioParaEliminar.value
-    //    if (usuario != null) {
-     //       eliminarUsuario(usuario.id)
-       // }
-        //cerrarDialogo()
-   // }
+    fun confirmarEliminacion() {
+        val usuario = _usuarioParaEliminar.value ?: return
 
-    fun eliminarUsuario(id: Long) {
+        val id = usuario.id ?: run {
+            _errorMessage.value = "Usuario sin ID válido, no se puede eliminar."
+            cerrarDialogo()
+            return
+        }
+
+        eliminarUsuario(id)
+    }
+
+    private fun eliminarUsuario(id: Long) {
         viewModelScope.launch {
+            _isLoading.value = true
             try {
                 val resultado = repository.eliminarUsuarioAdmin(id)
                 if (resultado) {
-                    cargarUsuarios()
+                    usuariosCompletos = usuariosCompletos.filter { it.id != id }
+                    aplicarFiltrosYOrdenamiento()
                 } else {
-                    _errorMessage.value = "No se pudo eliminar el usuario"
+                    _errorMessage.value = "No se pudo eliminar el usuario."
                 }
             } catch (e: Exception) {
                 _errorMessage.value = "Error al eliminar: ${e.message}"
+            } finally {
+                _isLoading.value = false
+                cerrarDialogo()
             }
         }
     }

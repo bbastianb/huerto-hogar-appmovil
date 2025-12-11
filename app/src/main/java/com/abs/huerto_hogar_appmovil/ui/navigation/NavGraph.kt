@@ -26,6 +26,7 @@ import com.abs.huerto_hogar_appmovil.ui.screens.registro.RegistroScreen
 import com.abs.huerto_hogar_appmovil.ui.screens.CheckoutScreen
 import com.abs.huerto_hogar_appmovil.ui.screens.EditarPerfilScreen
 import com.abs.huerto_hogar_appmovil.ui.screens.adminScreens.ListadoUsuariosScreen
+import com.abs.huerto_hogar_appmovil.ui.screens.adminScreens.PerfilAdminScreen
 
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.authVM.RegistroViewModel
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.CartViewModel
@@ -34,6 +35,7 @@ import com.abs.huerto_hogar_appmovil.ui.viewmodels.DetalleProductoViewModel
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.DetalleProductoViewModelFactory
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.adminVM.ListadoUsersViewModel
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.EditarPerfilViewModel
+import com.abs.huerto_hogar_appmovil.ui.viewmodels.adminVM.PerfilAdminViewModel
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.authVM.LoginViewModel
 
 @Composable
@@ -198,6 +200,28 @@ fun AppNavGraph(
                 viewModel = checkoutViewModel
             )
         }
+        composable(Routes.PerfilAdmin.route) {
+            val perfilAdminVM: PerfilAdminViewModel = viewModel(
+                factory = object : ViewModelProvider.Factory {
+                    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                        @Suppress("UNCHECKED_CAST")
+                        return PerfilAdminViewModel(usuarioRepository) as T
+                    }
+                }
+            )
+
+            PerfilAdminScreen(
+                viewModel = perfilAdminVM,
+                onVolverClick = { navController.popBackStack() },
+                onCerrarSesion = {
+                    usuarioRepository.cerrarSesion()
+                    navController.navigate(Routes.Login.route) {
+                        popUpTo(Routes.Home.route) { inclusive = true }
+                    }
+                }
+            )
+        }
+
         composable(Routes.EditarPerfil.route) {
 
             val editarPerfilViewModel: EditarPerfilViewModel = viewModel(

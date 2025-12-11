@@ -21,4 +21,5 @@ data class Usuario(
     val region: String,
     // "admin" / "usuario"
     val rol: String,
+    val fotoPerfil: String? = null
 )
