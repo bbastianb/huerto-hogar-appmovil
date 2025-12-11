@@ -11,6 +11,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 
 import com.abs.huerto_hogar_appmovil.data.repository.ProductoRepository
 import com.abs.huerto_hogar_appmovil.data.repository.UsuarioRepository
@@ -24,6 +25,7 @@ import com.abs.huerto_hogar_appmovil.ui.screens.authScreens.LoginScreen
 import com.abs.huerto_hogar_appmovil.ui.screens.NosotrosScreen
 import com.abs.huerto_hogar_appmovil.ui.screens.registro.RegistroScreen
 import com.abs.huerto_hogar_appmovil.ui.screens.CheckoutScreen
+import com.abs.huerto_hogar_appmovil.ui.screens.EditarPerfilScreen
 import com.abs.huerto_hogar_appmovil.ui.screens.adminScreens.ListadoUsuariosScreen
 
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.authVM.RegistroViewModel
@@ -32,6 +34,7 @@ import com.abs.huerto_hogar_appmovil.ui.viewmodels.CheckoutViewModel
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.DetalleProductoViewModel
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.DetalleProductoViewModelFactory
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.adminVM.ListadoUsersViewModel
+import com.abs.huerto_hogar_appmovil.ui.viewmodels.authVM.EditarPerfilViewModel
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.authVM.LoginViewModel
 
 @Composable
@@ -195,6 +198,29 @@ fun AppNavGraph(
                     }
                 },
                 viewModel = checkoutViewModel
+            )
+        }
+        composable (Routes.EditarPerfil.route){
+            val context = LocalContext.current
+            val usuarioRepository = UsuarioRepository(context)
+
+            val viewModel: EditarPerfilViewModel = viewModel (
+                factory = object : ViewModelProvider.Factory{
+                    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                        @Suppress("UNCHECKED_CAST")
+                        return EditarPerfilViewModel(usuarioRepository) as T
+                    }
+                }
+            )
+            EditarPerfilScreen(
+                viewModel = viewModel,
+                onVolverClick = {navController.popBackStack()},
+                onCerrarSesion = {
+                    usuarioRepository.cerrarSesion()
+                    navController.navigate(Routes.Login.route){
+                        popUpTo (Routes.Home.route){inclusive=true  }
+                    }
+                }
             )
         }
     }

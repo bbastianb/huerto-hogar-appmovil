@@ -9,6 +9,7 @@ class UsuarioRepository {
     private val api = RetrofitClient.usuarioApi
 
     companion object {
+
         var tokenActual: String? = null
             private set
 
@@ -18,8 +19,11 @@ class UsuarioRepository {
         var emailActual: String? = null
             private set
 
-        private var ultimoErrorRegistro: String? = null
+        var idActual: Long? = null
+            private set
 
+        var usuarioActual: Usuario? = null
+            private set
     }
 
     suspend fun login(email: String, contrasenna: String): Usuario? {
@@ -41,6 +45,8 @@ class UsuarioRepository {
         tokenActual = body.token
         rolActual = body.usuario.rol
         emailActual = body.usuario.email
+        idActual = body.usuario.id
+        usuarioActual = body.usuario
 
         return body.usuario
     }
@@ -48,24 +54,11 @@ class UsuarioRepository {
     suspend fun registrar(usuario: Usuario): Boolean {
         return try {
             val response = api.registrar(usuario)
-
-            if (response.isSuccessful) {
-                ultimoErrorRegistro = null
-                true
-            } else {
-                val bodyError = response.errorBody()?.string()
-                ultimoErrorRegistro = "Error ${response.code()}: ${bodyError ?: "sin detalle"}"
-                false
-            }
+            response.isSuccessful
         } catch (e: Exception) {
-            ultimoErrorRegistro = "Excepción: ${e.message}"
             false
         }
     }
-
-    fun obtenerUltimoErrorRegistro(): String? = ultimoErrorRegistro
-
-
 
     suspend fun obtenerUsuariosAdmin(): List<Usuario> {
         val token = tokenActual ?: return emptyList()
@@ -81,6 +74,27 @@ class UsuarioRepository {
             emptyList()
         }
     }
+    suspend fun actualizarPerfilUsuario(usuarioActualizado: Usuario): Usuario{
+        val token = tokenActual ?: throw Exception("Usuario no autenticado")
+        val id = idActual ?: throw Exception ("ID de usuario no disponible")
+
+        val response = api.actualizarUsuario(
+            authHeader = "Bearer $token",
+            id = id,
+            usuarioActualizado = usuarioActualizado
+        )
+        if (!response.isSuccessful) {
+            val errorBody = response.errorBody()?.string()
+            throw Exception("HTTP ${response.code()} - ${errorBody ?: "error al actualizar usuario"}")
+        }
+        val body = response.body() ?: throw Exception("Respuesta vacia del servidor")
+
+        emailActual= body.email
+        rolActual = body.rol
+        idActual = body.id
+        usuarioActual =body
+        return body
+    }
 
     suspend fun eliminarUsuarioAdmin(idUsuario: Long): Boolean {
         val token = tokenActual ?: return false
@@ -93,5 +107,17 @@ class UsuarioRepository {
         }
     }
 
+    fun cerrarSesion(){
+        tokenActual = null
+        rolActual =null
+        emailActual = null
+        idActual =null
+        usuarioActual = null
+    }
+
     fun obtenerRolActual(): String? = rolActual
+    fun obtenerUsuarioActual(): Usuario? = usuarioActual
+
+
+
 }

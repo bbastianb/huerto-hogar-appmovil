@@ -64,12 +64,10 @@ fun HuertoBottomBar(
             colors = itemColors
         )
 
-        // PERFIL (por ahora solo navega a Home o a futuro)
         NavigationBarItem(
-            selected = selectedRoute == "perfil",
+            selected = selectedRoute == Routes.EditarPerfil.route,
             onClick = {
-                // cuando tengan pantalla de perfil, aquí va Routes.Perfil.route
-                onNavigate(Routes.Home.route)
+                onNavigate(Routes.EditarPerfil.route)
             },
             icon = { Icon(Icons.Outlined.Person, contentDescription = "Perfil") },
             label = { Text("Perfil") },
