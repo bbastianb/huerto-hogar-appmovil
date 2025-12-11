@@ -29,7 +29,7 @@ fun HomeScreen(
     onIrCatalogo: () -> Unit,
     onIrNosotros: () -> Unit,
     onIrContacto: () -> Unit,
-    onIrAdmin: () -> Unit,
+
 ) {
     // imágenes del carrusel (usa las que están en tu res/drawable)
     val imagenesCarrusel = listOf(
@@ -114,12 +114,7 @@ fun HomeScreen(
             ) {
                 Text("Contacto")
             }
-            OutlinedButton(
-                onClick = onIrAdmin,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Admin")
-            }
+
         }
         Text(
             text = "Productos Recomendados",
