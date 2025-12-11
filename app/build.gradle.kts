@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -17,7 +19,21 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        //Leer API Key desde local.properties
+        val localProperties = Properties()
+        rootProject.file("local.properties").inputStream().use {
+            localProperties.load(it)
+        }
+
+        val mapsApiKey = localProperties["GOOGLE_MAPS_API_KEY"] ?: ""
+
+        //Agregamos al manifest
+        manifestPlaceholders["GOOGLE_MAPS_API_KEY"] = mapsApiKey
+
+        //Agregar al BuildConfig
+        buildConfigField("String", "GOOGLE_MAPS_API_KEY", "\"$mapsApiKey\"")
     }
+
 
     buildTypes {
         release {
@@ -37,7 +53,9 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig=true
     }
+
 }
 
 dependencies {
@@ -96,6 +114,9 @@ dependencies {
     implementation("com.google.accompanist:accompanist-permissions:0.34.0")
     // Dependencia para cargar la imagen después de ser capturada
     implementation("io.coil-kt:coil-compose:2.1.0")
+    // Google Maps para Jetpack Compose
+    implementation("com.google.maps.android:maps-compose:6.4.3")
+
 
 
     implementation("androidx.emoji2:emoji2:1.4.0")//eliminar sola para antes de agregar fotos
@@ -107,6 +128,8 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.play.services.maps)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -114,4 +137,5 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+
 }
