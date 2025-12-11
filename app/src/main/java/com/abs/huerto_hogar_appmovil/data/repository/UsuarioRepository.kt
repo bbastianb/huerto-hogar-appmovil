@@ -3,6 +3,11 @@ package com.abs.huerto_hogar_appmovil.data.repository
 import com.abs.huerto_hogar_appmovil.data.model.Usuario
 import com.abs.huerto_hogar_appmovil.data.remote.RetrofitClient
 import com.abs.huerto_hogar_appmovil.data.remote.SolicitudLogin
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import retrofit2.HttpException
+import java.io.File
 
 class UsuarioRepository {
 
@@ -24,6 +29,9 @@ class UsuarioRepository {
 
         var usuarioActual: Usuario? = null
             private set
+
+        private var ultimoErrorRegistro: String? = null
+
     }
 
     suspend fun login(email: String, contrasenna: String): Usuario? {
@@ -54,11 +62,77 @@ class UsuarioRepository {
     suspend fun registrar(usuario: Usuario): Boolean {
         return try {
             val response = api.registrar(usuario)
-            response.isSuccessful
+
+            if (response.isSuccessful) {
+                ultimoErrorRegistro = null
+                true
+            } else {
+                val bodyError = response.errorBody()?.string()
+                ultimoErrorRegistro = "Error ${response.code()}: ${bodyError ?: "sin detalle"}"
+                false
+            }
         } catch (e: Exception) {
+            ultimoErrorRegistro = "Excepción: ${e.message}"
             false
         }
     }
+
+
+
+    fun obtenerUltimoErrorRegistro(): String? = ultimoErrorRegistro
+
+    suspend fun registrarConFotoOpcional(
+        usuario: Usuario,
+        fotoFile: File
+    ): Boolean {
+        return try {
+            ultimoErrorRegistro = null
+
+            val responseRegistro = api.registrar(usuario)
+
+            if (!responseRegistro.isSuccessful || responseRegistro.body() == null) {
+                val errorBody = responseRegistro.errorBody()?.string()
+                ultimoErrorRegistro =
+                    errorBody ?: "Error al registrar: código ${responseRegistro.code()}"
+                return false
+            }
+
+            val usuarioCreado = responseRegistro.body()!!
+            val idUsuario = usuarioCreado.id
+                ?: run {
+                    ultimoErrorRegistro = "El usuario creado no devolvió un ID"
+                    return false
+                }
+
+            val requestFile = fotoFile
+                .asRequestBody("image/*".toMediaTypeOrNull())
+
+            val multipartBody = MultipartBody.Part.createFormData(
+                name = "foto",
+                filename = fotoFile.name,
+                body = requestFile
+            )
+
+            val responseFoto = api.actualizarFotoPerfil(idUsuario, multipartBody)
+
+            if (!responseFoto.isSuccessful || responseFoto.body() == null) {
+                val errorBodyFoto = responseFoto.errorBody()?.string()
+                ultimoErrorRegistro =
+                    errorBodyFoto ?: "Error al subir foto: código ${responseFoto.code()}"
+                return false
+            }
+
+            true
+
+        } catch (e: HttpException) {
+            ultimoErrorRegistro = "Error HTTP: ${e.code()} ${e.message()}"
+            false
+        } catch (e: Exception) {
+            ultimoErrorRegistro = e.message
+            false
+        }
+    }
+
 
     suspend fun obtenerUsuariosAdmin(): List<Usuario> {
         val token = tokenActual ?: return emptyList()
