@@ -25,13 +25,13 @@ android {
             localProperties.load(it)
         }
 
-        val mapsApiKey = localProperties["MAPS_API_KEY"] ?: ""
+        val mapsApiKey = localProperties["GOOGLE_MAPS_API_KEY"] ?: ""
 
         //Agregamos al manifest
-        manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
+        manifestPlaceholders["GOOGLE_MAPS_API_KEY"] = mapsApiKey
 
         //Agregar al BuildConfig
-        buildConfigField("String", "MAPS_API_KEY", "\"$mapsApiKey\"")
+        buildConfigField("String", "GOOGLE_MAPS_API_KEY", "\"$mapsApiKey\"")
     }
 
 
