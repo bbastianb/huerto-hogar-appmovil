@@ -1,5 +1,6 @@
 package com.abs.huerto_hogar_appmovil.ui.viewmodels
 
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.abs.huerto_hogar_appmovil.data.model.Producto
@@ -10,25 +11,33 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class CatalogoViewModel(private val repository: ProductoRepository,private val carritoRepository: CarritoRepository) : ViewModel() {
+class CatalogoViewModel(
+    private val productoRepository: ProductoRepository,
+    private val carritoRepository: CarritoRepository
+) : ViewModel() {
 
     private val _productos = MutableStateFlow<List<Producto>>(emptyList())
     val productos: StateFlow<List<Producto>> = _productos.asStateFlow()
 
-    private val _categoria= MutableStateFlow("Todas")
+    private val _categoria = MutableStateFlow("Todas")
     val categoria: StateFlow<String> = _categoria.asStateFlow()
 
     private val _isLoading = MutableStateFlow(true)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
+    init {
+        // Usa tus propias funciones
+        cargarProductosIniciales()
+        observarProductos()
+    }
+
     fun agregarAlCarrito(productoId: String) {
         viewModelScope.launch {
-            println("Agregando producto $productoId al carrito")
             val exito = carritoRepository.agregarAlCarrito(productoId, 1)
             if (exito) {
-                println(" Producto agregado al carrito")
+                println("Producto agregado al carrito")
             } else {
-                println(" Error al agregar al carrito - Stock insuficiente")
+                println("Stock insuficiente")
             }
         }
     }
@@ -38,33 +47,28 @@ class CatalogoViewModel(private val repository: ProductoRepository,private val c
         cargarProductosPorCategoria(nuevaCategoria)
     }
 
-    init {
-        cargarProductosIniciales()
-        observarProductos()
-    }
-
     private fun cargarProductosIniciales() {
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                repository.cargarProductosIniciales()
+                productoRepository.cargarProductosIniciales()
             } catch (e: Exception) {
-                println("Error al cargar productos iniciales")
-            } finally {
-                _isLoading.value = false
+                println("Error al cargar productos iniciales: ${e.message}")
+                // igual dejamos que observarProductos ponga isLoading en false
             }
         }
     }
 
-
     private fun observarProductos() {
         viewModelScope.launch {
-                        try {
-                repository.obtenerTodos().collect { listaProductos ->
+            try {
+                productoRepository.obtenerTodos().collect { listaProductos ->
                     _productos.value = listaProductos
+                    _isLoading.value = false   // ✅ cuando ya tenemos datos, apagamos el loading
                 }
             } catch (e: Exception) {
-                println("Error al cargar productos")
+                println("Error al cargar productos: ${e.message}")
+                _isLoading.value = false     // para que no se quede pegado en loading
             }
         }
     }
@@ -73,16 +77,12 @@ class CatalogoViewModel(private val repository: ProductoRepository,private val c
         viewModelScope.launch {
             try {
                 if (categoria == "Todas") {
-                    repository.obtenerTodos().collect {
-                        _productos.value = it
-                    }
+                    productoRepository.obtenerTodos().collect { _productos.value = it }
                 } else {
-                    repository.obtenerPorCategoria(categoria).collect {
-                        _productos.value = it
-                    }
+                    productoRepository.obtenerPorCategoria(categoria).collect { _productos.value = it }
                 }
             } catch (e: Exception) {
-                println("Error al cargar productos por categoría")
+                println("Error al cargar productos por categoría: ${e.message}")
             }
         }
     }
@@ -91,15 +91,12 @@ class CatalogoViewModel(private val repository: ProductoRepository,private val c
         viewModelScope.launch {
             try {
                 if (query.length >= 2) {
-                    repository.buscarPorNombre(query).collect {
-                        _productos.value = it
-                    }
+                    productoRepository.buscarPorNombre(query).collect { _productos.value = it }
                 } else if (query.isEmpty()) {
                     cargarProductosPorCategoria(_categoria.value)
-                } else {
                 }
             } catch (e: Exception) {
-                println("Error al buscar productos")
+                println("Error al buscar productos: ${e.message}")
             }
         }
     }

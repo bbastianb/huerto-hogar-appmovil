@@ -23,7 +23,7 @@ import com.abs.huerto_hogar_appmovil.ui.theme.HuertohogarappmovilTheme
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.CartViewModel
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.CatalogoViewModel
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.CheckoutViewModel
-
+import com.abs.huerto_hogar_appmovil.data.remote.RetrofitProducto
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,7 +38,7 @@ class MainActivity : ComponentActivity() {
             .fallbackToDestructiveMigration()
             .build()
 
-        val productoRepository = ProductoRepository(database.productoDao())
+        val productoRepository = ProductoRepository(database.productoDao(), RetrofitProducto.apiProducto)
         val carritoRepository  = CarritoRepository(database.carritoDao(), productoRepository)
         val usuarioRepository  = UsuarioRepository()
         val pedidoRepository  = PedidoRepository(database.pedidoDao(), RetrofitOrden.apiOrden)
