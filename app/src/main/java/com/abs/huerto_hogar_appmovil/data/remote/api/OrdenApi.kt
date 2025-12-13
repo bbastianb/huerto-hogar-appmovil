@@ -17,11 +17,17 @@ interface OrdenApi {
         @Body orden: OrdenRequestDto
     ): Response<OrdenResponseDto>
 
-    @GET("api/orden")
-    suspend fun listarOrdenes(): Response<List<OrdenResponseDto>>
+    //@GET("api/orden")
+    //suspend fun listarOrdenes(): Response<List<OrdenResponseDto>>
 
     @GET("api/orden/buscar/{id}")
     suspend fun buscarOrden(
         @Path("id") id: Long
     ): Response<OrdenResponseDto>
+
+    @GET("api/orden")
+    suspend fun listarOrdenes(
+        @Header("Authorization") authHeader: String // Aquí pasas el token
+    ): Response<List<OrdenResponseDto>>
+
 }

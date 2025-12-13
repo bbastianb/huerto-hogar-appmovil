@@ -7,6 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.lifecycle.ViewModelProvider
+import com.abs.huerto_hogar_appmovil.data.repository.PedidoRepository
 
 import com.abs.huerto_hogar_appmovil.data.repository.ProductoRepository
 import com.abs.huerto_hogar_appmovil.data.repository.UsuarioRepository
@@ -18,6 +19,7 @@ import com.abs.huerto_hogar_appmovil.ui.viewmodels.CartViewModel
 fun AppRoot(
     usuarioRepository: UsuarioRepository,
     productoRepository: ProductoRepository,
+    pedidoRepository: PedidoRepository,
     catalogoViewModelFactory: ViewModelProvider.Factory,
     cartViewModelFactory: ViewModelProvider.Factory,
     cartViewModel: CartViewModel,
@@ -79,6 +81,7 @@ fun AppRoot(
             catalogoViewModelFactory = catalogoViewModelFactory,
             cartViewModelFactory = cartViewModelFactory,
             cartViewModel = cartViewModel,
+            pedidoRepository = pedidoRepository,
             checkoutViewModelFactory= checkoutViewModelFactory,
             modifier = Modifier.padding(inner),
             startDestination = Routes.Login.route // o Routes.Catalogo.route si ya hay sesión,
