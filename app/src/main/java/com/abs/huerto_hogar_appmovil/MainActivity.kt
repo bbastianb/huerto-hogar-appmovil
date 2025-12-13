@@ -97,7 +97,8 @@ class MainActivity : ComponentActivity() {
                         catalogoViewModelFactory = catalogoViewModelFactory,
                         cartViewModelFactory = cartViewModelFactory,
                         cartViewModel = cartViewModel,
-                        checkoutViewModelFactory = checkoutViewModelFactory
+                        checkoutViewModelFactory = checkoutViewModelFactory,
+                        pedidoRepository = pedidoRepository
                     )
                 }
             }
