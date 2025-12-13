@@ -31,7 +31,6 @@ interface OrdenApi {
         @Path("id") id: Long
     ): Response<OrdenResponseDto>
 
-
     @PUT("api/orden/actualizar-estado/{idOrden}")
     suspend fun actualizarEstadoEnvio(
         @Header("Authorization") authHeader: String,

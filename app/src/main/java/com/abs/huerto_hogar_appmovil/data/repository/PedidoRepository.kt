@@ -103,4 +103,18 @@ class PedidoRepository(
             )
         }
     }
+    suspend fun obtenerOrdenesDesdeBackend(): List<OrdenResponseDto> {
+        val token = UsuarioRepository.tokenActual
+            ?: throw Exception("Usuario no autenticado")
+
+        val response = ordenApi.listarOrdenes("Bearer $token")
+
+        if (!response.isSuccessful) {
+            throw Exception("Error al obtener órdenes: ${response.code()}")
+        }
+
+        return response.body() ?: emptyList()
+    }
+
+
 }

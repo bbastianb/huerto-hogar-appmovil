@@ -26,20 +26,21 @@ fun AdminBottomBar(
         containerColor = MaterialTheme.colorScheme.surface,
         contentColor = MaterialTheme.colorScheme.onSurface
     ) {
-        // PRODUCTOS (AdminScreen)
+        // Ordenes (AdminScreen)
         NavigationBarItem(
             selected = selectedRoute == Routes.AdminScreen.route,
             onClick = { onNavigate(Routes.AdminScreen.route) },
             icon = {
                 Icon(
                     Icons.Outlined.Inventory,
-                    contentDescription = "Productos"
+                    contentDescription = "Pedidos"
                 )
             },
-            label = { Text("Admin") },
+            label = { Text("Pedidos") },
             colors = itemColors
         )
 
+        // USUARIOS (ListadoUsers)
         NavigationBarItem(
             selected = selectedRoute == Routes.ListadoUsers.route,
             onClick = { onNavigate(Routes.ListadoUsers.route) },
@@ -71,6 +72,5 @@ fun AdminBottomBar(
             label = { Text("Perfil") },
             colors = itemColors
         )
-
     }
 }

@@ -1,5 +1,6 @@
 package com.abs.huerto_hogar_appmovil.ui.navigation
 
+
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -30,15 +31,19 @@ import com.abs.huerto_hogar_appmovil.ui.screens.EditarPerfilScreen
 import com.abs.huerto_hogar_appmovil.ui.screens.authScreens.LoginScreen
 import com.abs.huerto_hogar_appmovil.ui.screens.registro.RegistroScreen
 
+import com.abs.huerto_hogar_appmovil.ui.viewmodels.authVM.RegistroViewModel
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.CartViewModel
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.CheckoutViewModel
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.DetalleProductoViewModel
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.DetalleProductoViewModelFactory
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.EditarPerfilViewModel
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.adminVM.ListadoUsersViewModel
+import com.abs.huerto_hogar_appmovil.ui.viewmodels.EditarPerfilViewModel
+import com.abs.huerto_hogar_appmovil.ui.viewmodels.adminVM.AdminViewModel
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.adminVM.PerfilAdminViewModel
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.authVM.LoginViewModel
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.authVM.RegistroViewModel
+import com.abs.huerto_hogar_appmovil.data.repository.PedidoRepository
 
 @Composable
 fun AppNavGraph(
@@ -48,16 +53,17 @@ fun AppNavGraph(
     catalogoViewModelFactory: ViewModelProvider.Factory,
     cartViewModelFactory: ViewModelProvider.Factory,
     productoRepository: ProductoRepository,
+    pedidoRepository: PedidoRepository,
     cartViewModel: CartViewModel,
     modifier: Modifier = Modifier,
     startDestination: String = Routes.Login.route
+
 ) {
     NavHost(
         navController = navController,
         startDestination = startDestination,
         modifier = modifier
     ) {
-
         composable(Routes.Login.route) {
             val loginViewModel: LoginViewModel = viewModel(
                 factory = object : ViewModelProvider.Factory {
@@ -95,7 +101,6 @@ fun AppNavGraph(
                     }
                 }
             )
-
             RegistroScreen(
                 viewModel = registroViewModel,
                 onRegistroExitoso = {
@@ -107,7 +112,6 @@ fun AppNavGraph(
                 onIrALogin = { navController.popBackStack() }
             )
         }
-
         composable(Routes.Home.route) {
             HomeScreen(
                 onIrCatalogo = { navController.navigate(Routes.Catalogo.route) },
@@ -115,12 +119,32 @@ fun AppNavGraph(
                 onIrContacto = { navController.navigate(Routes.Contacto.route) },
             )
         }
-
         composable(Routes.Nosotros.route) {
             NosotrosScreen(onBack = { navController.popBackStack() })
         }
 
         composable(Routes.Contacto.route) {
+            ContactoScreen(
+                onBack = { navController.popBackStack() }
+            )
+        }
+        composable (Routes.AdminScreen.route){
+            val adminViewModel: AdminViewModel = viewModel (
+                factory = object : ViewModelProvider.Factory{
+                    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                        @Suppress("UNCHECKED_CAST")
+                        return AdminViewModel(
+                            pedidoRepository = pedidoRepository
+                        ) as T
+                    }
+                }
+
+            )
+
+            AdminScreen(
+                viewModel = adminViewModel,
+                onBack = {navController.popBackStack()}
+            )
             ContactoScreen(onBack = { navController.popBackStack() })
         }
 
@@ -130,8 +154,7 @@ fun AppNavGraph(
                 onCartClick = { navController.navigate(Routes.Carrito.route) },
                 onProductClick = { productoId ->
                     navController.navigate(Routes.DetalleProducto.build(productoId))
-                },
-                onBackClick = { navController.popBackStack() },
+                }, onBackClick = {navController.popBackStack()},
                 onAddToCart = { id, cantidad ->
                     cartViewModel.agregarAlCarrito(id, cantidad)
                 }
@@ -159,8 +182,8 @@ fun AppNavGraph(
                 },
                 viewModel = checkoutViewModel
             )
-        }
 
+        }
         composable(
             route = Routes.DetalleProducto.route,
             arguments = listOf(navArgument("productoId") { type = NavType.StringType })
@@ -169,7 +192,6 @@ fun AppNavGraph(
             val detalleVm: DetalleProductoViewModel = viewModel(
                 factory = DetalleProductoViewModelFactory(productoRepository)
             )
-
             DetalleProductoScreen(
                 productoId = productoId,
                 onBackClick = { navController.popBackStack() },

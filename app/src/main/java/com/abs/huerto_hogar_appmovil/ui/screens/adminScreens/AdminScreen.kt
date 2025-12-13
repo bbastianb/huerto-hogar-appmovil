@@ -12,17 +12,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.abs.huerto_hogar_appmovil.data.repository.ProductoRepository
-
+import com.abs.huerto_hogar_appmovil.ui.viewmodels.adminVM.AdminViewModel
+import kotlin.math.min
 import kotlin.collections.count
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AdminScreen(
-    productoRepository: ProductoRepository,
+    viewModel: AdminViewModel,
     onBack: () -> Unit
 ) {
-    val productos by productoRepository.obtenerTodos().collectAsState(initial = emptyList())
+
+    val state by viewModel.uiState.collectAsState()
+
+    val ultimas = state.ordenesBackend.take(5)
 
     Scaffold(
         topBar = {
@@ -45,41 +48,53 @@ fun AdminScreen(
 
             Text("Bienvenido, Administrador", style = MaterialTheme.typography.titleMedium)
 
-            Row(
+            Row (
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 SmallStatCard(
-                    title = "Productos",
-                    value = productos.size.toString(),
+                    title = "Ordenes totales",
+                    value = state.totalOrdenes.toString(),
                     modifier = Modifier.weight(1f)
                 )
                 SmallStatCard(
-                    title = "Stock crítico",
-                    value = productos.count { it.stock <= 0 }.toString(),
+                    title = "Últimas",
+                    value = ultimas.size.toString(),
                     modifier = Modifier.weight(1f)
                 )
             }
+            if (state.isLoading) {
+                CircularProgressIndicator()
+                return@Column
+            }
 
-            Text("Listado de productos", style = MaterialTheme.typography.titleSmall)
+            state.error?.let { msg ->
+                Text(msg, color = MaterialTheme.colorScheme.error)
+            }
+
+            Text("Últimas ordenes", style = MaterialTheme.typography.titleSmall)
 
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(productos) { p ->
+                items(ultimas) { orden ->
                     Card {
-                        Column(
+                        Column (
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(12.dp),
                             verticalArrangement = Arrangement.spacedBy(4.dp)
-                        ) {
-                            Text(p.nombre, style = MaterialTheme.typography.titleSmall)
-                            Text("Categoría: ${p.categoria}", style = MaterialTheme.typography.bodySmall)
-                            Text("Stock: ${p.stock}", style = MaterialTheme.typography.bodySmall)
-                            Text("Precio: ${p.precio}", style = MaterialTheme.typography.bodySmall)
+                        ){
+                            Text(
+                                "Orden #${orden.idOrden}",
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text("Fecha: ${orden.fechaOrden}", style = MaterialTheme.typography.bodySmall)
+                            Text("Total: $${orden.total}", style = MaterialTheme.typography.bodySmall)
                         }
                     }
+
                 }
             }
         }
