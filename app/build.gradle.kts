@@ -59,6 +59,9 @@ android {
 }
 
 dependencies {
+    testImplementation("io.mockk:mockk:1.13.10")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+
 
     implementation(libs.androidx.material3)
     implementation(libs.androidx.compose.runtime)
