@@ -38,11 +38,9 @@ import com.abs.huerto_hogar_appmovil.ui.viewmodels.DetalleProductoViewModel
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.DetalleProductoViewModelFactory
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.EditarPerfilViewModel
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.adminVM.ListadoUsersViewModel
-import com.abs.huerto_hogar_appmovil.ui.viewmodels.EditarPerfilViewModel
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.adminVM.AdminViewModel
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.adminVM.PerfilAdminViewModel
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.authVM.LoginViewModel
-import com.abs.huerto_hogar_appmovil.ui.viewmodels.authVM.RegistroViewModel
 import com.abs.huerto_hogar_appmovil.data.repository.PedidoRepository
 
 @Composable
@@ -223,10 +221,22 @@ fun AppNavGraph(
             )
         }
 
-        composable(Routes.AdminScreen.route) {
+        composable (Routes.AdminScreen.route){
+            val adminViewModel: AdminViewModel = viewModel (
+                factory = object : ViewModelProvider.Factory{
+                    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                        @Suppress("UNCHECKED_CAST")
+                        return AdminViewModel(
+                            pedidoRepository = pedidoRepository
+                        ) as T
+                    }
+                }
+
+            )
+
             AdminScreen(
-                productoRepository = productoRepository,
-                onBack = { navController.popBackStack() }
+                viewModel = adminViewModel,
+                onBack = {navController.popBackStack()}
             )
         }
 
