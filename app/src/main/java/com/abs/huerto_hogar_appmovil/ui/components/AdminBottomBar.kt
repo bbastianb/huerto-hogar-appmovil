@@ -7,6 +7,7 @@ import androidx.compose.material.icons.outlined.Groups
 import androidx.compose.material.icons.outlined.Inventory
 import androidx.compose.material.icons.outlined.Person
 import com.abs.huerto_hogar_appmovil.ui.navigation.Routes
+import androidx.compose.material.icons.outlined.ReceiptLong
 
 @Composable
 fun AdminBottomBar(
@@ -35,11 +36,10 @@ fun AdminBottomBar(
                     contentDescription = "Productos"
                 )
             },
-            label = { Text("Productos") },
+            label = { Text("Admin") },
             colors = itemColors
         )
 
-        // USUARIOS (ListadoUsers)
         NavigationBarItem(
             selected = selectedRoute == Routes.ListadoUsers.route,
             onClick = { onNavigate(Routes.ListadoUsers.route) },
@@ -53,11 +53,24 @@ fun AdminBottomBar(
             colors = itemColors
         )
         NavigationBarItem(
+            selected = selectedRoute == Routes.ListadoOrdenes.route,
+            onClick = { onNavigate(Routes.ListadoOrdenes.route) },
+            icon = {
+                Icon(
+                    Icons.Outlined.ReceiptLong,
+                    contentDescription = "Órdenes"
+                )
+            },
+            label = { Text("Órdenes") },
+            colors = itemColors
+        )
+        NavigationBarItem(
             selected = selectedRoute == Routes.PerfilAdmin.route,
             onClick = { onNavigate(Routes.PerfilAdmin.route) },
             icon = { Icon(Icons.Outlined.Person, contentDescription = "Mi perfil") },
             label = { Text("Perfil") },
             colors = itemColors
         )
+
     }
 }

@@ -29,10 +29,12 @@ data class OrdenRequestDto(
     @SerializedName("detalleEnvio") val detalleEnvio: DetalleEnvioDto
 )
 
-// Si quieres mapear la respuesta
 data class OrdenResponseDto(
     @SerializedName("id_orden") val idOrden: Long,
     @SerializedName("fecha_orden") val fechaOrden: String,
-    @SerializedName("total") val total: Double
-    // puedes agregar más campos si te interesa
+    @SerializedName("total") val total: Double,
+    @SerializedName("detalleEnvio") val detalleEnvio: DetalleEnvioDto? = null,
+    @SerializedName("usuario") val usuario: UsuarioOrdenDto? = null
 )
+
+data class EstadoEnvioBody(val estado: String)

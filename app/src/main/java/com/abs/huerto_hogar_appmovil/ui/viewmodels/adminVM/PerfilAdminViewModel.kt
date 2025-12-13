@@ -8,6 +8,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.File
+import android.graphics.Bitmap
+import com.abs.huerto_hogar_appmovil.utils.toBitmap
+
+
 
 data class PerfilAdminUiState(
     val nombre: String = "",
@@ -19,6 +23,7 @@ data class PerfilAdminUiState(
     val region: String = "",
     val nuevaContrasenna: String = "",
     val confirmarContrasenna: String = "",
+    val fotoRemota: Bitmap? = null,
     val mensaje: String? = null,
     val error: String? = null,
     val isSaving: Boolean = false
@@ -33,6 +38,18 @@ class PerfilAdminViewModel(private val usuarioRepository: UsuarioRepository) : V
 
     init {
         cargarDatosIniciales()
+        cargarFotoInicial()
+    }
+
+    private fun cargarFotoInicial() {
+        viewModelScope.launch {
+            try {
+                val bytes = usuarioRepository.obtenerFotoPerfilActual()
+                val bmp = bytes?.toBitmap()
+                _uiState.update { it.copy(fotoRemota = bmp) }
+            } catch (_: Exception) {
+            }
+        }
     }
 
     private fun cargarDatosIniciales() {
@@ -145,8 +162,11 @@ class PerfilAdminViewModel(private val usuarioRepository: UsuarioRepository) : V
                 nuevaFotoFile?.let { file ->
                     usuarioRepository.actualizarFotoPerfilActual(file)
                     nuevaFotoFile = null
-                }
 
+                    val bytes = usuarioRepository.obtenerFotoPerfilActual()
+                    val bmp = bytes?.toBitmap()
+                    _uiState.update { it.copy(fotoRemota = bmp) }
+                }
                 _uiState.update {
                     it.copy(
                         isSaving = false,
