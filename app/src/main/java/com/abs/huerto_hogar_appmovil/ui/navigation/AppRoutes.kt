@@ -23,8 +23,8 @@ sealed class Routes(val route: String) {
     // Admin
     data object AdminScreen : Routes("admin_screen")
     data object ListadoUsers : Routes("listadoUsers")
-
     data object PerfilAdmin: Routes("perfi-admin")
+    data object ListadoOrdenes : Routes("listadoOrdenes")
 
     // Detalle con parámetro
     data object DetalleProducto : Routes("detalle_producto/{productoId}") {

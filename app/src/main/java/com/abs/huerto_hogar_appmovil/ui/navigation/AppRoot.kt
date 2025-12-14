@@ -34,7 +34,8 @@ fun AppRoot(
     val isAdminRoute = currentRoute in listOf(
         Routes.AdminScreen.route,
         Routes.ListadoUsers.route,
-        Routes.PerfilAdmin.route
+        Routes.PerfilAdmin.route,
+        Routes.ListadoOrdenes.route
     )
 
     val hideBottomBar =

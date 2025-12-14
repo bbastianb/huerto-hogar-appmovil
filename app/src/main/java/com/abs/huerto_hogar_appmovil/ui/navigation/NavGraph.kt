@@ -14,27 +14,30 @@ import androidx.compose.ui.Modifier
 
 import com.abs.huerto_hogar_appmovil.data.repository.ProductoRepository
 import com.abs.huerto_hogar_appmovil.data.repository.UsuarioRepository
+
 import com.abs.huerto_hogar_appmovil.ui.screens.adminScreens.AdminScreen
+import com.abs.huerto_hogar_appmovil.ui.screens.adminScreens.ListadoUsuariosScreen
+import com.abs.huerto_hogar_appmovil.ui.screens.adminScreens.PerfilAdminScreen
+import com.abs.huerto_hogar_appmovil.ui.screens.adminScreens.ListadoOrdensScreen
+
 import com.abs.huerto_hogar_appmovil.ui.screens.CarritoScreen
 import com.abs.huerto_hogar_appmovil.ui.screens.CatalogoScreen
 import com.abs.huerto_hogar_appmovil.ui.screens.ContactoScreen
 import com.abs.huerto_hogar_appmovil.ui.screens.DetalleProductoScreen
 import com.abs.huerto_hogar_appmovil.ui.screens.HomeScreen
-import com.abs.huerto_hogar_appmovil.ui.screens.authScreens.LoginScreen
 import com.abs.huerto_hogar_appmovil.ui.screens.NosotrosScreen
-import com.abs.huerto_hogar_appmovil.ui.screens.registro.RegistroScreen
 import com.abs.huerto_hogar_appmovil.ui.screens.CheckoutScreen
 import com.abs.huerto_hogar_appmovil.ui.screens.EditarPerfilScreen
-import com.abs.huerto_hogar_appmovil.ui.screens.adminScreens.ListadoUsuariosScreen
-import com.abs.huerto_hogar_appmovil.ui.screens.adminScreens.PerfilAdminScreen
+import com.abs.huerto_hogar_appmovil.ui.screens.authScreens.LoginScreen
+import com.abs.huerto_hogar_appmovil.ui.screens.registro.RegistroScreen
 
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.authVM.RegistroViewModel
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.CartViewModel
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.CheckoutViewModel
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.DetalleProductoViewModel
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.DetalleProductoViewModelFactory
-import com.abs.huerto_hogar_appmovil.ui.viewmodels.adminVM.ListadoUsersViewModel
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.EditarPerfilViewModel
+import com.abs.huerto_hogar_appmovil.ui.viewmodels.adminVM.ListadoUsersViewModel
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.adminVM.AdminViewModel
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.adminVM.PerfilAdminViewModel
 import com.abs.huerto_hogar_appmovil.ui.viewmodels.authVM.LoginViewModel
@@ -79,7 +82,7 @@ fun AppNavGraph(
                     }
                 },
                 onLoginExitosoAdmin = {
-                    navController.navigate(Routes.AdminScreen.route){
+                    navController.navigate(Routes.AdminScreen.route) {
                         popUpTo(Routes.Login.route) { inclusive = true }
                         launchSingleTop = true
                     }
@@ -115,10 +118,9 @@ fun AppNavGraph(
             )
         }
         composable(Routes.Nosotros.route) {
-            NosotrosScreen(
-                onBack = { navController.popBackStack() }
-            )
+            NosotrosScreen(onBack = { navController.popBackStack() })
         }
+
         composable(Routes.Contacto.route) {
             ContactoScreen(
                 onBack = { navController.popBackStack() }
@@ -141,6 +143,7 @@ fun AppNavGraph(
                 viewModel = adminViewModel,
                 onBack = {navController.popBackStack()}
             )
+            ContactoScreen(onBack = { navController.popBackStack() })
         }
 
         composable(Routes.Catalogo.route) {
@@ -153,35 +156,29 @@ fun AppNavGraph(
                 onAddToCart = { id, cantidad ->
                     cartViewModel.agregarAlCarrito(id, cantidad)
                 }
-
-            )
-        }
-
-        composable(Routes.ListadoUsers.route) {
-            val listadoUsersViewModel: ListadoUsersViewModel = viewModel(
-                factory = object : ViewModelProvider.Factory {
-                    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                        @Suppress("UNCHECKED_CAST")
-                        return ListadoUsersViewModel(usuarioRepository) as T
-                    }
-                }
-            )
-
-            ListadoUsuariosScreen(
-                viewModel = listadoUsersViewModel
             )
         }
 
         composable(Routes.Carrito.route) {
             CarritoScreen(
                 viewModel = viewModel(factory = cartViewModelFactory),
-                onBackClick = {
-                    navController.popBackStack()
-                },
-                onCheckoutClick = {
-                    navController.navigate(Routes.Checkout.route)
-                }
+                onBackClick = { navController.popBackStack() },
+                onCheckoutClick = { navController.navigate(Routes.Checkout.route) }
+            )
+        }
 
+        composable(Routes.Checkout.route) {
+            val checkoutViewModel: CheckoutViewModel =
+                viewModel(factory = checkoutViewModelFactory)
+
+            CheckoutScreen(
+                onBackClick = { navController.popBackStack() },
+                onOrderComplete = {
+                    navController.navigate(Routes.Catalogo.route) {
+                        popUpTo(Routes.Catalogo.route) { inclusive = true }
+                    }
+                },
+                viewModel = checkoutViewModel
             )
 
         }
@@ -202,44 +199,7 @@ fun AppNavGraph(
             )
         }
 
-        composable(Routes.Checkout.route) {
-            val checkoutViewModel: CheckoutViewModel =
-                viewModel(factory = checkoutViewModelFactory)
-
-            CheckoutScreen(
-                onBackClick = { navController.popBackStack() },
-                onOrderComplete = {
-                    navController.navigate(Routes.Catalogo.route) {
-                        popUpTo(Routes.Catalogo.route) { inclusive = true }
-                    }
-                },
-                viewModel = checkoutViewModel
-            )
-        }
-        composable(Routes.PerfilAdmin.route) {
-            val perfilAdminVM: PerfilAdminViewModel = viewModel(
-                factory = object : ViewModelProvider.Factory {
-                    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                        @Suppress("UNCHECKED_CAST")
-                        return PerfilAdminViewModel(usuarioRepository) as T
-                    }
-                }
-            )
-
-            PerfilAdminScreen(
-                viewModel = perfilAdminVM,
-                onVolverClick = { navController.popBackStack() },
-                onCerrarSesion = {
-                    usuarioRepository.cerrarSesion()
-                    navController.navigate(Routes.Login.route) {
-                        popUpTo(Routes.Home.route) { inclusive = true }
-                    }
-                }
-            )
-        }
-
         composable(Routes.EditarPerfil.route) {
-
             val editarPerfilViewModel: EditarPerfilViewModel = viewModel(
                 factory = object : ViewModelProvider.Factory {
                     override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -261,5 +221,64 @@ fun AppNavGraph(
             )
         }
 
+        composable (Routes.AdminScreen.route){
+            val adminViewModel: AdminViewModel = viewModel (
+                factory = object : ViewModelProvider.Factory{
+                    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                        @Suppress("UNCHECKED_CAST")
+                        return AdminViewModel(
+                            pedidoRepository = pedidoRepository
+                        ) as T
+                    }
+                }
+
+            )
+
+            AdminScreen(
+                viewModel = adminViewModel,
+                onBack = {navController.popBackStack()}
+            )
+        }
+
+        composable(Routes.ListadoUsers.route) {
+            val listadoUsersViewModel: ListadoUsersViewModel = viewModel(
+                factory = object : ViewModelProvider.Factory {
+                    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                        @Suppress("UNCHECKED_CAST")
+                        return ListadoUsersViewModel(usuarioRepository) as T
+                    }
+                }
+            )
+
+            ListadoUsuariosScreen(viewModel = listadoUsersViewModel)
+        }
+
+        composable(Routes.ListadoOrdenes.route) {
+            ListadoOrdensScreen(
+                onVolver = { navController.popBackStack() }
+            )
+        }
+
+        composable(Routes.PerfilAdmin.route) {
+            val perfilAdminVM: PerfilAdminViewModel = viewModel(
+                factory = object : ViewModelProvider.Factory {
+                    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                        @Suppress("UNCHECKED_CAST")
+                        return PerfilAdminViewModel(usuarioRepository) as T
+                    }
+                }
+            )
+
+            PerfilAdminScreen(
+                viewModel = perfilAdminVM,
+                onVolverClick = { navController.popBackStack() },
+                onCerrarSesion = {
+                    usuarioRepository.cerrarSesion()
+                    navController.navigate(Routes.Login.route) {
+                        popUpTo(Routes.Home.route) { inclusive = true }
+                    }
+                }
+            )
+        }
     }
 }

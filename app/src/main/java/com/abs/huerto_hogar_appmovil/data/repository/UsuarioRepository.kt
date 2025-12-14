@@ -112,7 +112,7 @@ class UsuarioRepository {
                 body = requestFile
             )
 
-            val responseFoto = api.actualizarFotoPerfil(idUsuario, multipartBody)
+            val responseFoto = api.actualizarFotoPerfil(null,idUsuario, multipartBody)
 
             if (!responseFoto.isSuccessful || responseFoto.body() == null) {
                 val errorBodyFoto = responseFoto.errorBody()?.string()
@@ -185,7 +185,8 @@ class UsuarioRepository {
             body = requestFile
         )
 
-        val response = api.actualizarFotoPerfil(id, multipartBody)
+        val token = tokenActual ?: throw Exception("Usuario no autenticado")
+        val response = api.actualizarFotoPerfil(token,id, multipartBody)
 
         if (!response.isSuccessful) {
             val errorBody = response.errorBody()?.string()
@@ -197,6 +198,15 @@ class UsuarioRepository {
         usuarioActual = body
 
         return body
+    }
+
+    suspend fun obtenerFotoPerfilActual(): ByteArray? {
+        val id = idActual ?: return null
+        val authHeader = tokenActual?.let { "Bearer $it" }
+
+        val resp = api.obtenerFotoPerfil(authHeader, id)
+
+        return resp.body()?.bytes()
     }
 
 

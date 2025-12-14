@@ -3,6 +3,7 @@ package com.abs.huerto_hogar_appmovil.data.remote.api
 import com.abs.huerto_hogar_appmovil.data.model.Usuario
 import com.abs.huerto_hogar_appmovil.data.remote.*
 import okhttp3.MultipartBody
+import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -44,11 +45,19 @@ interface UsuarioApi {
         @Path("id") id: Long
     ): Response<Unit>
 
+    @GET("api/usuario/{id}/foto-perfil")
+    suspend fun obtenerFotoPerfil(
+        @Header("Authorization") authHeader: String?,
+        @Path("id") id: Long
+    ): Response<ResponseBody>
+
     @Multipart
     @PUT("api/usuario/{id}/foto-perfil")
     suspend fun actualizarFotoPerfil(
+        @Header("Authorization") authHeader: String?,
         @Path("id") id: Long,
         @Part foto: MultipartBody.Part
     ): Response<Usuario>
+
 
 }

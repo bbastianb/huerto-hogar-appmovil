@@ -98,8 +98,8 @@ class PedidoRepository(
         val pedido = pedidoDao.obtenerOrdenPorId(pedidoId)
         return pedido?.let {
             PedidoConItems(
-                pedido = it,  // ✅ CAMBIADO: "order" por "pedido"
-                items = pedidoDao.obtenerItemsPorOrden(pedidoId)  // ✅ CAMBIADO: "orderId" por "pedidoId"
+                pedido = it,
+                items = pedidoDao.obtenerItemsPorOrden(pedidoId)
             )
         }
     }
