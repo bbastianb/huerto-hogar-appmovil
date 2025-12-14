@@ -7,7 +7,7 @@ import kotlin.jvm.java
 
 
 object RetrofitProducto {
-    private const val BASE_URL = "http://192.168.1.31:8080/"
+    private const val BASE_URL = "http://10.0.2.2:8080/"
     val apiProducto: ProductoApi by lazy {
         Retrofit.Builder()
             .baseUrl(BASE_URL)
