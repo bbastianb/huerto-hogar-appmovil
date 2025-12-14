@@ -17,6 +17,9 @@ class UsuarioRepository {
 
         var tokenActual: String? = null
             private set
+        fun setTokenForTests(token: String?){
+            tokenActual=token
+        }
 
         var rolActual: String? = null
             private set

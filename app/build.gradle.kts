@@ -114,8 +114,14 @@ dependencies {
     implementation("com.google.accompanist:accompanist-permissions:0.34.0")
     // Dependencia para cargar la imagen después de ser capturada
     implementation("io.coil-kt:coil-compose:2.1.0")
+
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1")
+    testImplementation("io.mockk:mockk:1.13.12")
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+    debugImplementation("androidx.compose.ui:ui-test-manifest")
     // Google Maps para Jetpack Compose
     implementation("com.google.maps.android:maps-compose:6.4.3")
+
 
 
 
